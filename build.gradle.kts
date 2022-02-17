@@ -9,6 +9,7 @@ plugins {
 val javalinVersion: String by project
 val slf4jVersion: String by project
 val jacksonVersion: String by project
+val surenessVersion: String by project
 
 repositories {
     mavenCentral()
@@ -24,10 +25,12 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
 
+    implementation("com.usthe.sureness:sureness-core:$surenessVersion")
+
 }
 
 application {
-    mainClassName = "com.spendyourtime.Server"
+    mainClassName = "com.spendyourtime.ServerTest"
 }
 
 tasks.getByName<ShadowJar>("shadowJar") {
