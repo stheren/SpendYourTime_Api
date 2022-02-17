@@ -17,6 +17,11 @@ object Server {
             app.get("/ping") { ctx ->
                 ctx.json("Pong")
             }
+            //USER INPUT API
+
+            app.get("/position") { ctx ->
+                ctx
+            }
         }
     }
 }
