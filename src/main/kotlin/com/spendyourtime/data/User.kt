@@ -1,6 +1,6 @@
 package com.spendyourtime.data
 
-class User(var email: String, var pseudo: String, var password: String, var player : Player){
+class User(var email: String, var pseudo: String, var password: String, var player : Player = Player()){
 
     companion object {
         var allUsers = arrayListOf<User>()
