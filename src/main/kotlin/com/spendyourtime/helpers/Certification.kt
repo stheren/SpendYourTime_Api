@@ -12,18 +12,15 @@ object Certification {
         val jwt = JWT.es256(JWTKeyID("kid-123")) {
             subject("Token ID")
             claim("email", u.email)
-            claim("pseudo", u.pseudo)
-            claim("password", u.password)
             issuedAt(LocalDateTime.ofInstant(Instant.ofEpochSecond(1516239022), ZoneId.of("UTC")))
         }
         return jwt.encode()
     }
 
-    fun find(e : String, p : (User) -> Unit){
-        println(JWT.decode(e).tap {
+    fun find(token : String, p : (User) -> Unit){
+        println(JWT.decode(token).tap {
             println(it.claimValue("email"))
-            println(it.claimValue("pseudo"))
+            p(User.findUserByPseudo(it.claimValue("email").toString()) ?: throw Exception("User don't exist !"))
         })
-        //p(User("Email", "Pseudo", "OK", Skin(), Player()))
     }
 }

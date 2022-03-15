@@ -6,13 +6,13 @@ class Skin(var body: Int, var accessories: Int, var hairstyle: Int, var eyes: In
         const val minBody = 1
         const val maxBody = 9
         const val minAccessories = 1
-        const val maxAccessories = 1
+        const val maxAccessories = 2
         const val minHairstyle = 1
-        const val maxHairstyle = 1
+        const val maxHairstyle = 2
         const val minEyes = 1
-        const val maxEyes = 1
+        const val maxEyes = 2
         const val minOutfit = 1
-        const val maxOutfit = 1
+        const val maxOutfit = 2
     }
 
     constructor() : this(1,1,1,1,1)
@@ -22,9 +22,9 @@ class Skin(var body: Int, var accessories: Int, var hairstyle: Int, var eyes: In
             throw Exception("Body must be between $minBody and $maxBody")
         if(accessories !in minAccessories until maxAccessories)
             throw Exception("accessoiries must be between $minAccessories and $maxAccessories")
-        if(hairstyle in minHairstyle until maxHairstyle)
+        if(hairstyle !in minHairstyle until maxHairstyle)
             throw Exception("hairstyle must be between $minHairstyle and $maxAccessories")
-        if(eyes !in maxEyes until minEyes)
+        if(eyes !in minEyes until maxEyes)
             throw Exception("eyes must be between $minEyes and $maxEyes")
         if(outfit !in minOutfit until maxOutfit)
             throw Exception("outfit must be between $minOutfit and $maxOutfit")
