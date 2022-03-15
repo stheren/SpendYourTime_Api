@@ -15,20 +15,21 @@ class Skin(var body: Int, var accessoiries: Int, var hairstyle: Int, var eyes: I
         val maxOutfit = 1
     }
 
-    init{
-        if(body < minBody || maxBody < body)
-            throw Exception("Body must be between " + minBody + " and " + maxBody)
-        if(accessoiries < minAccessoiries || maxAccessoiries < accessoiries)
-            throw Exception("accessoiries must be between " + minAccessoiries + " and " + maxAccessoiries)
-        if(hairstyle < minHairstyle || maxHairstyle < hairstyle)
-            throw Exception("hairstyle must be between " + minHairstyle + " and " + maxAccessoiries)
-        if(eyes < minEyes || maxEyes < eyes)
-            throw Exception("eyes must be between " + minEyes + " and " + maxEyes)
-        if(outfit < minOutfit || maxOutfit < outfit)
-            throw Exception("outfit must be between " + minOutfit + " and " + maxOutfit)
+    constructor() : this(1,1,1,1,1)
+
+    init {
+        if (body in (maxBody + 1) until minBody)
+            throw Exception("Body must be between $minBody and $maxBody")
+        if (accessoiries in (maxAccessoiries + 1) until minAccessoiries)
+            throw Exception("accessoiries must be between $minAccessoiries and $maxAccessoiries")
+        if (hairstyle in (maxHairstyle + 1) until minHairstyle)
+            throw Exception("hairstyle must be between $minHairstyle and $maxAccessoiries")
+        if (eyes in (maxEyes + 1) until minEyes)
+            throw Exception("eyes must be between $minEyes and $maxEyes")
+        if (outfit in (maxOutfit + 1) until minOutfit)
+            throw Exception("outfit must be between $minOutfit and $maxOutfit")
     }
 
-    Skin() : Skin(1, 1, 1, 1)
 
     override fun equals(other: Any?) : Boolean{
         return other != null 

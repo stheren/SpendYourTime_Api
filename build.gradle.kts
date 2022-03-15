@@ -25,7 +25,9 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
     implementation("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
 
-    implementation("com.usthe.sureness:sureness-core:$surenessVersion")
+    implementation("io.github.nefilim.kjwt:kjwt-core:0.5.1")
+    implementation("io.github.nefilim.kjwt:kjwt-google-kms-grpc:0.5.1")
+    implementation("io.github.nefilim.kjwt:kjwt-jwks:0.5.1")
 
 }
 
