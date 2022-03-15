@@ -151,11 +151,8 @@ object Server {
             //Player
             app.post("/Player/position") { ctx ->
                 var errors = arrayListOf<String>()
-                // Assigment d'abord :
                 val x = ctx.formParam("posX")?.toInt() ?: -1
                 val y = ctx.formParam("posY")?.toInt() ?: -1
-                // CA veut dire :
-                // x est egale a posX si il est null alors il est egal a -1
 
                 logger.info("PlayerPosition")
                 if (ctx.formParam("posX").isNullOrEmpty()) {

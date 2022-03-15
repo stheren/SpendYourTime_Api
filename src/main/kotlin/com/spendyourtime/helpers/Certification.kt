@@ -9,6 +9,8 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 object Certification {
+
+
     fun create(u : User) : String{
         val jwt = JWT.es256(JWTKeyID("kid-123")) {
             subject("Token ID")
@@ -18,10 +20,10 @@ object Certification {
         return jwt.encode()
     }
 
-    fun find(token : String, p : (User) -> Unit){
+    fun find(token : String, p : (User?) -> Unit) {
         JWT.decode(token).tap {
             it.claimValue("email").tap { email ->
-                p(User.findUserByEmail(email) ?: throw Exception("User don't exist !"))
+                    p(User.findUserByEmail(email))
             }
         }
     }
