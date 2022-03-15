@@ -95,13 +95,24 @@ object Server {
                     logger.info("POST_LOGIN")
                     var errors = arrayListOf<String>()
 
+                    //Check pseudo login
                     if (ctx.formParam("pseudo").isNullOrEmpty()) {
                         errors.add("PSEUDO_IS_EMPTY")
                         logger.info("PSEUDO_IS_EMPTY")
                     }
+                    if (User.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
+                        errors.add("PSEUDO_UNKNOW")
+                        logger.info("PSEUDO_UNKNOW")
+                    }
+
+                    //check Password login
                     if (ctx.formParam("password").isNullOrEmpty()) {
                         errors.add("PASSWORD_IS_EMPTY")
                         logger.info("PASSWORD_IS_EMPTY")
+                    }
+                    if(!User.checkPassword(ctx.formParam("pseudo").toString(), ctx.formParam("password").toString())) {
+                        errors.add("PASSWORD_INCORRECT")
+                        logger.info("PASSWORD_INCORRECT")
                     }
 
                     if (errors.isNotEmpty()) {
