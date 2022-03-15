@@ -1,12 +1,16 @@
 package com.spendyourtime
 
+import com.usthe.sureness.DefaultSurenessConfig
 import io.javalin.Javalin
+import io.javalin.apibuilder.ApiBuilder.*
 import org.slf4j.LoggerFactory
 
+
 object Server {
-    class Position(var x: Int, var y: Int, var name: String)
+    class Position(var x: Int, var y: Int)
     class Skin(var body: Int, var accesories: Int, var hairstyle: Int, var eyes: Int, var outfit: Int)
     class User(var email: String, var pseudo: String, var password: String, var skin: Skin)
+    class player(var id: Int, var user: User, var position: Position)
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -19,52 +23,49 @@ object Server {
             }
         }.start(7000)
 
+
         app.routes {
             app.get("/ping") { ctx ->
                 ctx.json("Pong")
             } //c'est rigolo
 
             //USER REGISTER + LOGIN
-            app.post("/User/register") { ctx ->
-                logger.info(ctx.body())
-                ctx.status(501)
-            }
+            path("User") {
+                post("register") { ctx ->
+                    logger.info(ctx.body())
+                    ctx.status(501)
+                }
 
-            app.post("/user/login") { ctx ->
-                logger.info(ctx.body())
-                ctx.status(501)
-            }
+                post("login") { ctx ->
+                    logger.info(ctx.body())
+                    ctx.status(501)
+                }
 
-            app.post("/user/name") { ctx ->
-                logger.info(ctx.body())
-                ctx.status(501)
-            }
+                post("name") { ctx ->
+                    logger.info(ctx.body())
+                    ctx.status(501)
+                }
 
-            app.get("/user/skin") { ctx ->
-                logger.info(ctx.body())
-                ctx.status(501)
+                get("skin") { ctx ->
+                    logger.info(ctx.body())
+                    ctx.status(501)
+                }
             }
-
 
             //Player
+                app.post("/Player/position") { ctx ->
+                    logger.info(ctx.body())
+                    ctx.status(501).json(ctx.status(501))
+                }
 
-            app.post("/player/position") { ctx ->
-                logger.info(ctx.body())
-                ctx.status(501)
-            }
+                app.put("User/skin") { ctx ->
+                    logger.info("CHANGE_SKIN_PLAYER")
+                    ctx.status(501)
+                }
 
-            app.get("/player/skin") { ctx ->
-                logger.info("RECUP_MAP")
-                ctx.status(501)
-            }
-
-            app.put("/player/skin") { ctx ->
-                logger.info("ACCESS_PLAYER_SKIN")
-                ctx.status(501)
-            }
 
             //MAP
-            app.get("/map") { ctx->
+            get("map") { ctx ->
                 logger.info("RECUP_MAP")
                 ctx.status(501)
             }

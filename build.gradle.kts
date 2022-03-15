@@ -30,7 +30,7 @@ dependencies {
 }
 
 application {
-    mainClassName = "com.spendyourtime.ServerTest"
+    mainClassName = "com.spendyourtime.Server"
 }
 
 tasks.getByName<ShadowJar>("shadowJar") {
