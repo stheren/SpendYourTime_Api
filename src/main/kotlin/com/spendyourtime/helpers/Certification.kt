@@ -1,17 +1,20 @@
 package com.spendyourtime.helpers
 
-import com.spendyourtime.data.Player
-import com.spendyourtime.data.Skin
 import com.spendyourtime.data.User
 import io.github.nefilim.kjwt.JWT
 import io.github.nefilim.kjwt.JWTKeyID
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 object Certification {
     fun create(u : User) : String{
         val jwt = JWT.es256(JWTKeyID("kid-123")) {
+            subject("Token ID")
             claim("email", u.email)
             claim("pseudo", u.pseudo)
             claim("password", u.password)
+            issuedAt(LocalDateTime.ofInstant(Instant.ofEpochSecond(1516239022), ZoneId.of("UTC")))
         }
         return jwt.encode()
     }
