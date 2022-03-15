@@ -1,5 +1,6 @@
 package com.spendyourtime.helpers
 
+import arrow.core.some
 import com.spendyourtime.data.User
 import io.github.nefilim.kjwt.JWT
 import io.github.nefilim.kjwt.JWTKeyID
@@ -18,9 +19,10 @@ object Certification {
     }
 
     fun find(token : String, p : (User) -> Unit){
-        println(JWT.decode(token).tap {
-            println(it.claimValue("email"))
-            p(User.findUserByPseudo(it.claimValue("email").toString()) ?: throw Exception("User don't exist !"))
-        })
+        JWT.decode(token).tap {
+            it.claimValue("email").tap { email ->
+                p(User.findUserByEmail(email) ?: throw Exception("User don't exist !"))
+            }
+        }
     }
 }
