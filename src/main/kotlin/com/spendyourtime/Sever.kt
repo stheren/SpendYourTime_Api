@@ -132,30 +132,30 @@ object Server {
 
                 get("skin") { ctx ->
                     logger.info("GET_SKIN")
-                    Certification.find(ctx.header("token").toString()) { user ->
-                        logger.info(user.toString())
-                        if (user == null) {
-                            ctx.json("DECODED_BUT_UNKNOW_PLAYER")
-                            ctx.status(403)
-                        } else {
-                            ctx.json(user.player.skin)
-                            ctx.status(200)
-                        }
+                    Certification.verification(ctx) { user ->
+                        ctx.json(user.player.skin)
+                        ctx.status(200)
                     }
 
                 }
 
-
                 app.put("skin") { ctx ->
-
                     logger.info("CHANGE_SKIN_PLAYER")
-
-                    ctx.status(501)
+                    Certification.verification(ctx) { user ->
+                        user.player.skin.body = ctx.formParam("body")?.toInt() ?: user.player.skin.body
+                        user.player.skin.eyes = ctx.formParam("eyes")?.toInt() ?: user.player.skin.eyes
+                        user.player.skin.accessories = ctx.formParam("accessories")?.toInt() ?: user.player.skin.accessories
+                        user.player.skin.hairstyle = ctx.formParam("hairstyle")?.toInt() ?: user.player.skin.hairstyle
+                        user.player.skin.outfit = ctx.formParam("outfit")?.toInt() ?: user.player.skin.outfit
+                        ctx.status(201)
+                        ctx.json("CHANGED_SKIN")
+                    }
                 }
             }
 
             //Player
-            app.post("/Player/position") { ctx ->
+            app.post("/Player/position")
+            { ctx ->
                 var errors = arrayListOf<String>()
                 val x = ctx.formParam("posX")?.toInt() ?: -1
                 val y = ctx.formParam("posY")?.toInt() ?: -1
@@ -190,7 +190,8 @@ object Server {
             }
 
             //Guilde
-            path("Guild") {
+            path("Guild")
+            {
                 get("allGuild") { ctx ->
                     logger.info("GET_ALL_GUILD")
                     ctx.status(501)
@@ -211,7 +212,8 @@ object Server {
 
 
             //MAP
-            get("map") { ctx ->
+            get("map")
+            { ctx ->
                 logger.info("RECUP_MAP")
                 ctx.status(501)
             }
