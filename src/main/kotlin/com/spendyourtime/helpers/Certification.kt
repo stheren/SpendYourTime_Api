@@ -13,10 +13,10 @@ object Certification {
         return jwt.encode()
     }
 
-    fun find(e : String) : User{
+    fun find(e : String, p : (User) -> Unit){
         println(JWT.decode(e).tap {
             println(it.claimValue("name"))
         })
-        return User("Email", "Pseudo", "OK", Skin())
+        p(User("Email", "Pseudo", "OK", Skin()))
     }
 }
