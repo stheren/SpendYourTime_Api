@@ -14,6 +14,12 @@ class User(var email: String, var pseudo: String, passwordText: String, var play
         fun findUserByEmail(email :String) : User?{
             return allUsers.find { it.email == email }
         }
+        fun checkPassword(pseudo : String, pswText : String) : Boolean{
+            var u = findUserByPseudo(pseudo)
+            if(u ==null)
+                throw Exception("Unknwon user")
+            return u.password.equals(Hashing.sha256().hashString(pswText, StandardCharsets.UTF_8).toString())
+        }
     }
 
     var password : String = Hashing.sha256()
@@ -32,9 +38,7 @@ class User(var email: String, var pseudo: String, passwordText: String, var play
         allUsers.add(this)
     }
 
-    fun checkPassword(pswText : String) : Boolean{
-        return password.equals(Hashing.sha256().hashString(pswText, StandardCharsets.UTF_8).toString())
-    }
+    
 
     override fun equals(other: Any?) : Boolean{
         return hashCode() == other.hashCode()
