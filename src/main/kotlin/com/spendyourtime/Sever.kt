@@ -17,7 +17,10 @@ object Server {
         val logger = LoggerFactory.getLogger(this::class.java)
 
         val app = Javalin.create().apply {
-            exception(Exception::class.java) { e, ctx -> ctx.json("Not found") }
+            exception(Exception::class.java) { e, ctx ->
+                ctx.json(e.message.toString())
+                ctx.status(403)
+            }
             this.error(404) { ctx ->
                 ctx.json("Error")
             }
@@ -129,21 +132,24 @@ object Server {
 
                 get("skin") { ctx ->
                     logger.info("GET_SKIN")
-
                     Certification.find(ctx.header("token").toString()) { user ->
                         logger.info(user.toString())
                         if (user == null) {
-                            ctx.json("Erreur")
+                            ctx.json("DECODED_BUT_UNKNOW_PLAYER")
                             ctx.status(403)
                         } else {
                             ctx.json(user.player.skin)
                             ctx.status(200)
                         }
                     }
+
                 }
 
+
                 app.put("skin") { ctx ->
+
                     logger.info("CHANGE_SKIN_PLAYER")
+
                     ctx.status(501)
                 }
             }
