@@ -1,5 +1,6 @@
 package com.spendyourtime
 
+import com.spendyourtime.data.Player
 import com.spendyourtime.data.Skin
 import com.spendyourtime.data.User
 import com.spendyourtime.helpers.Certification
@@ -41,7 +42,11 @@ object Server {
                     }
                     if (EmailValidator.isEmailValid(ctx.formParam("email").toString())) {
                         errors.add("EMAIL_NOT_VALID")
-                        logger.info("EMAIL_IS_EMPTY")
+                        logger.info("EMAIL_NOT_VALID")
+                    }
+                    if(User.findUserByEmail(ctx.formParam("email").toString()) != null){
+                        errors.add("EMAIL_ALREADY_USE")
+                        logger.info("EMAIL_ALREADY_USE")
                     }
 
                     //verif pseudo
@@ -56,6 +61,10 @@ object Server {
                     if (ctx.formParam("pseudo").toString().length > 12) {
                         errors.add("PSEUDO_TOO_LONG")
                         logger.info("PSEUDO_TOO_LONG")
+                    }
+                    if(User.findUserByPseudo(ctx.formParam("pseudo").toString()) != null){
+                        errors.add("PSEUDO_ALREADY_USE")
+                        logger.info("PSEUDO_ALREADY_USE")
                     }
 
                     //verif password
@@ -73,8 +82,7 @@ object Server {
                         var u: User = User(
                             ctx.formParam("email").toString(),
                             ctx.formParam("pseudo").toString(),
-                            ctx.formParam("password").toString(),
-                            Skin()
+                            ctx.formParam("password").toString()
                         )
                         ctx.status(201)
                         ctx.json(Certification.create(u))
@@ -101,6 +109,7 @@ object Server {
                         logger.info("FAILED_LOGIN_IN")
                         logger.info("END_OF_LOGIN")
                     } else {
+
                         //ctx.json(Certification.create(u))
                         ctx.json("Success_Login_in")
                         ctx.status(202)
