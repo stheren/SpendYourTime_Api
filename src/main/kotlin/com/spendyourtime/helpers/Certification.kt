@@ -1,5 +1,8 @@
 package com.spendyourtime.helpers
 
+import arrow.core.handleError
+import arrow.core.left
+import arrow.core.leftIfNull
 import arrow.core.some
 import com.spendyourtime.data.User
 import io.github.nefilim.kjwt.JWT
@@ -21,10 +24,13 @@ object Certification {
     }
 
     fun find(token : String, p : (User?) -> Unit) {
-        JWT.decode(token).tap {
+        val e = JWT.decode(token).tap {
             it.claimValue("email").tap { email ->
                     p(User.findUserByEmail(email))
             }
+        }
+        e.handleError {
+            throw Exception("JWT Decode has an error.")
         }
     }
 }
