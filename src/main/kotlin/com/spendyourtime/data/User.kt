@@ -1,6 +1,6 @@
 package com.spendyourtime.data
 
-class User(var email: String, var pseudo: String, var password: String, var skin: Skin, var player : Player){
+class User(var email: String, var pseudo: String, var password: String, var player : Player){
 
     companion object {
         var allUsers = arrayListOf<User>()
@@ -13,11 +13,14 @@ class User(var email: String, var pseudo: String, var password: String, var skin
     }
 
     override fun equals(other: Any?) : Boolean{
-        return other != null 
-        && other is User 
-        && other.email.equals(this.email) 
-        && other.pseudo.equals(this.pseudo) 
-        && other.password.equals(this.password) 
-        && other.skin.equals(this.skin) 
+        return hashCode() == other.hashCode()
+    }
+
+    override fun hashCode(): Int {
+        var result = email.hashCode()
+        result = 31 * result + pseudo.hashCode()
+        result = 31 * result + password.hashCode()
+        result = 31 * result + player.hashCode()
+        return result
     }
 }
