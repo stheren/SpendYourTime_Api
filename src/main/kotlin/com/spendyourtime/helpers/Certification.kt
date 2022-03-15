@@ -5,12 +5,13 @@ import com.spendyourtime.data.User
 import io.github.nefilim.kjwt.JWT
 import io.github.nefilim.kjwt.JWTKeyID
 import io.javalin.http.Context
+import org.slf4j.LoggerFactory
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 object Certification {
-
+    val logger = LoggerFactory.getLogger(this::class.java)
 
     fun create(u : User) : String{
         val jwt = JWT.es256(JWTKeyID("kid-123")) {
@@ -18,6 +19,7 @@ object Certification {
             claim("email", u.email)
             issuedAt(LocalDateTime.ofInstant(Instant.ofEpochSecond(1516239022), ZoneId.of("UTC")))
         }
+        logger.info("Token is create for ${u.pseudo}")
         return jwt.encode()
     }
 
@@ -28,13 +30,15 @@ object Certification {
             }
         }
         e.handleError {
-            throw Exception("JWT Decode has an error.")
+            logger.info("UNDECODED_JWT_TOKEN")
+            throw Exception("UNDECODED_JWT_TOKEN")
         }
     }
 
     fun verification(ctx : Context, p : (User) -> Unit){
         find(ctx.header("token").toString()) { user ->
             if (user == null) {
+                logger.info("DECODED_BUT_UNKNOW_PLAYER")
                 ctx.json("DECODED_BUT_UNKNOW_PLAYER")
                 ctx.status(403)
             } else {
