@@ -40,7 +40,7 @@ object Server {
                         errors.add("EMAIL_IS_EMPTY")
                         logger.info("EMAIL_IS_EMPTY")
                     }
-                    if (EmailValidator.isEmailValid(ctx.formParam("email").toString())) {
+                    if (!EmailValidator.isEmailValid(ctx.formParam("email").toString())) {
                         errors.add("EMAIL_NOT_VALID")
                         logger.info("EMAIL_NOT_VALID")
                     }
@@ -110,7 +110,7 @@ object Server {
                         errors.add("PASSWORD_IS_EMPTY")
                         logger.info("PASSWORD_IS_EMPTY")
                     }
-                    if(!User.checkPassword(ctx.formParam("pseudo").toString(), ctx.formParam("password").toString())) {
+                    if (!User.checkPassword(ctx.formParam("pseudo").toString(), ctx.formParam("password").toString())) {
                         errors.add("PASSWORD_INCORRECT")
                         logger.info("PASSWORD_INCORRECT")
                     }
@@ -120,17 +120,26 @@ object Server {
                         logger.info("FAILED_LOGIN_IN")
                         logger.info("END_OF_LOGIN")
                     } else {
-
-                        //ctx.json(Certification.create(u))
+                        val u = User.findUserByPseudo(ctx.formParam("pseudo").toString())!!
+                        ctx.json(Certification.create(u))
                         ctx.json("Success_Login_in")
                         ctx.status(202)
                     }
                 }
 
                 get("skin") { ctx ->
-
                     logger.info("GET_SKIN")
-                    ctx.status(501)
+
+                    Certification.find(ctx.header("token").toString()) { user ->
+                        logger.info(user.toString())
+                        if (user == null) {
+                            ctx.json("Erreur")
+                            ctx.status(403)
+                        } else {
+                            ctx.json(user.player.skin)
+                            ctx.status(200)
+                        }
+                    }
                 }
 
                 app.put("skin") { ctx ->
