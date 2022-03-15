@@ -6,10 +6,6 @@ import org.slf4j.LoggerFactory
 
 
 object Server {
-    class Position(var x: Int, var y: Int)
-    class Skin(var body: Int, var accesories: Int, var hairstyle: Int, var eyes: Int, var outfit: Int)
-    class User(var email: String, var pseudo: String, var password: String, var skin: Skin)
-    class Player(var id: Int, var user: User, var position: Position)
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -31,8 +27,34 @@ object Server {
             //USER REGISTER + LOGIN
             path("User") {
                 post("register") { ctx ->
-                    logger.info("POST_REGISTER")
-                    ctx.status(501)
+                    logger.info("USER_REGISTER")
+                    var errors = arrayListOf<String>()
+                    if(ctx.formParam("email").isNullOrEmpty()){
+                        errors.add("EMAIL_IS_EMPTY")
+                        logger.info("EMAIL_IS_EMPTY")
+                    }
+                    if(ctx.formParam("pseudo").isNullOrEmpty()){
+                        errors.add("PSEUDO_IS_EMPTY")
+                        logger.info("PSEUDO_IS_EMPTY")
+                    }
+                    if(ctx.formParam("password").isNullOrEmpty()){
+                        errors.add("PASSWORD_IS_EMPTY")
+                        logger.info("PASSWORD_IS_EMPTY")
+                    }
+
+
+                    if(errors.isNotEmpty()){
+                        ctx.status(400).json(errors)
+                        logger.info("FAILED_OF_REGISTER")
+                        logger.info("END_OF_REGISTER")
+                    }
+                    else{
+                        //var u: User = User(ctx.formParam("email").toString(), ctx.formParam("pseudo").toString(), ctx.formParam("password").toString(), Skin())
+                        ctx.json("Success register")
+                        ctx.status(201)
+                        logger.info("SUCCESS_REGISTER")
+                        logger.info("END_OF_REGISTER")
+                    }
                 }
 
                 post("login") { ctx ->
@@ -49,18 +71,39 @@ object Server {
                     logger.info("GET_SKIN")
                     ctx.status(501)
                 }
+
+                app.put("skin") { ctx ->
+                    logger.info("CHANGE_SKIN_PLAYER")
+                    ctx.status(501)
+                }
             }
 
             //Player
                 app.post("/Player/position") { ctx ->
-                    logger.info("GET_PLAYER_POSITION")
+                    logger.info("POST_PLAYER_POSITION")
                     ctx.status(501).json(ctx.status(501))
                 }
 
-                app.put("User/skin") { ctx ->
-                    logger.info("CHANGE_SKIN_PLAYER")
+            //Guilde
+            path("Guild") {
+                get("allGuild") { ctx ->
+                    logger.info("GET_ALL_GUILD")
                     ctx.status(501)
                 }
+
+                get("members") { ctx ->
+                    logger.info("GET_ALL_MEMBERS_GUILD")
+                    ctx.status(501)
+                }
+
+                post("createGuild") { ctx ->
+                    logger.info("POST_GUILD")
+                    ctx.status(501)
+                }
+
+
+
+            }
 
 
             //MAP
