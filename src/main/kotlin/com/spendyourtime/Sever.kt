@@ -44,7 +44,7 @@ object Server {
                         errors.add("EMAIL_NOT_VALID")
                         logger.info("EMAIL_NOT_VALID")
                     }
-                    if(User.findUserByEmail(ctx.formParam("email").toString()) != null){
+                    if (User.findUserByEmail(ctx.formParam("email").toString()) != null) {
                         errors.add("EMAIL_ALREADY_USE")
                         logger.info("EMAIL_ALREADY_USE")
                     }
@@ -62,7 +62,7 @@ object Server {
                         errors.add("PSEUDO_TOO_LONG")
                         logger.info("PSEUDO_TOO_LONG")
                     }
-                    if(User.findUserByPseudo(ctx.formParam("pseudo").toString()) != null){
+                    if (User.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
                         errors.add("PSEUDO_ALREADY_USE")
                         logger.info("PSEUDO_ALREADY_USE")
                     }
@@ -116,12 +116,8 @@ object Server {
                     }
                 }
 
-                post("name") { ctx ->
-                    logger.info("POST_NAME")
-                    ctx.status(501)
-                }
-
                 get("skin") { ctx ->
+
                     logger.info("GET_SKIN")
                     ctx.status(501)
                 }
@@ -134,8 +130,34 @@ object Server {
 
             //Player
             app.post("/Player/position") { ctx ->
-                logger.info("POST_PLAYER_POSITION")
-                ctx.status(501).json(ctx.status(501))
+                var errors = arrayListOf<String>()
+                logger.info("PlayerPosition")
+                if (ctx.formParam("posX").isNullOrEmpty()) {
+                    errors.add("POSITION_X_ERROR")
+                    logger.info("POSITION_X_ERROR")
+                }
+                if (ctx.formParam("posX").toInt() < 0 or ctx.formParam("posX").toInt() > 100) {
+                    errors.add("POSITION_X_NOT_IN_MAP")
+                    logger.info("POSITION_X_NOT_IN_MAP")
+                }
+                if (ctx.formParam("posY").isNullOrEmpty()) {
+                    errors.add("POSITION_Y_ERROR")
+                    logger.info("POSITION_Y_ERROR")
+                }
+                if (ctx.formParam("posY").toInt() < 0 or ctx.formParam("posY").toInt() > 100) {
+                    errors.add("POSITION_Y_NOT_IN_MAP")
+                    logger.info("POSITION_Y_NOT_IN_MAP")
+                }
+
+                if (errors.isNotEmpty()) {
+                    ctx.status(400)
+                    ctx.json(errors)
+                    logger.info("ERROR_POSITION")
+                    logger.info("END_POSITION")
+                } else {
+                    ctx.status(200)
+                    ctx.json("SUCCESS_POSITION")
+                }
             }
 
             //Guilde
