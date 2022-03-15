@@ -32,6 +32,10 @@ class User(var email: String, var pseudo: String, passwordText: String, var play
         allUsers.add(this)
     }
 
+    fun checkPassword(pswText : String) : Boolean{
+        return password.equals(Hashing.sha256().hashString(pswText, StandardCharsets.UTF_8).toString())
+    }
+
     override fun equals(other: Any?) : Boolean{
         return hashCode() == other.hashCode()
     }
