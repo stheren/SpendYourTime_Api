@@ -142,7 +142,7 @@ object Server {
                     errors.add("POSITION_X_ERROR")
                     logger.info("POSITION_X_ERROR")
                 }
-                if (ctx.formParam("posX").toInt() < 0 or ctx.formParam("posX").toInt() > 100) {
+                if (x < 0 || x > 100) {
                     errors.add("POSITION_X_NOT_IN_MAP")
                     logger.info("POSITION_X_NOT_IN_MAP")
                 }
@@ -150,7 +150,7 @@ object Server {
                     errors.add("POSITION_Y_ERROR")
                     logger.info("POSITION_Y_ERROR")
                 }
-                if (ctx.formParam("posY").toInt() < 0 or ctx.formParam("posY").toInt() > 100) {
+                if (y < 0 || y > 100) {
                     errors.add("POSITION_Y_NOT_IN_MAP")
                     logger.info("POSITION_Y_NOT_IN_MAP")
                 }
