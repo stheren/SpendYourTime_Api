@@ -10,7 +10,10 @@ class Position(var x: Int, var y: Int){
     }
 
     init {
-        
+        if(x !in minX until maxX)
+            throw Exception("x must be between $minX and $maxX")
+        if(y !in minY until maxY)
+            throw Exception("y must be between $minY and $maxY")
     }
 
     override fun equals(other: Any?) : Boolean{
