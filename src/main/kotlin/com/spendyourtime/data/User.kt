@@ -1,10 +1,24 @@
 package com.spendyourtime.data
 
-class User(var email: String, var pseudo: String, var password: String, var player : Player = Player()){
+import com.google.common.hash.Hashing
+import java.nio.charset.StandardCharsets
+
+class User(var email: String, var pseudo: String, passwordText: String, var player : Player = Player()){
 
     companion object {
         var allUsers = arrayListOf<User>()
-    } 
+
+        fun findUserByPseudo(pseudo :String) : User?{
+            return allUsers.find { it.pseudo == pseudo }
+        }
+        fun findUserByEmail(email :String) : User?{
+            return allUsers.find { it.email == email }
+        }
+    }
+
+    var password : String = Hashing.sha256()
+        .hashString(passwordText, StandardCharsets.UTF_8)
+        .toString();
 
     init{
         if(allUsers.contains(this))
@@ -16,13 +30,6 @@ class User(var email: String, var pseudo: String, var password: String, var play
                 throw Exception("Email already exists")
         }
         allUsers.add(this)
-    }
-
-    fun findUserByPseudo(pseudo :String) : User?{
-        return allUsers.find { it.pseudo == pseudo }
-    }
-    fun findUserByEmail(email :String) : User?{
-        return allUsers.find { it.email == email }
     }
 
     override fun equals(other: Any?) : Boolean{
