@@ -1,32 +1,32 @@
 package com.spendyourtime.data
 
-class Skin(var body: Int, var accessoiries: Int, var hairstyle: Int, var eyes: Int, var outfit: Int){
+class Skin(var body: Int, var accessories: Int, var hairstyle: Int, var eyes: Int, var outfit: Int){
     
     companion object {
-        val minBody = 1
-        val maxBody = 9
-        val minAccessoiries = 1
-        val maxAccessoiries = 1
-        val minHairstyle = 1
-        val maxHairstyle = 1
-        val minEyes = 1
-        val maxEyes = 1
-        val minOutfit = 1
-        val maxOutfit = 1
+        const val minBody = 1
+        const val maxBody = 9
+        const val minAccessories = 1
+        const val maxAccessories = 1
+        const val minHairstyle = 1
+        const val maxHairstyle = 1
+        const val minEyes = 1
+        const val maxEyes = 1
+        const val minOutfit = 1
+        const val maxOutfit = 1
     }
 
     constructor() : this(1,1,1,1,1)
 
-    init {
-        if (body in (maxBody + 1) until minBody)
+    init{
+        if(body !in minBody until maxBody)
             throw Exception("Body must be between $minBody and $maxBody")
-        if (accessoiries in (maxAccessoiries + 1) until minAccessoiries)
-            throw Exception("accessoiries must be between $minAccessoiries and $maxAccessoiries")
-        if (hairstyle in (maxHairstyle + 1) until minHairstyle)
-            throw Exception("hairstyle must be between $minHairstyle and $maxAccessoiries")
-        if (eyes in (maxEyes + 1) until minEyes)
+        if(accessories !in minAccessories until maxAccessories)
+            throw Exception("accessoiries must be between $minAccessories and $maxAccessories")
+        if(hairstyle in minHairstyle until maxHairstyle)
+            throw Exception("hairstyle must be between $minHairstyle and $maxAccessories")
+        if(eyes !in maxEyes until minEyes)
             throw Exception("eyes must be between $minEyes and $maxEyes")
-        if (outfit in (maxOutfit + 1) until minOutfit)
+        if(outfit !in minOutfit until maxOutfit)
             throw Exception("outfit must be between $minOutfit and $maxOutfit")
     }
 
@@ -35,7 +35,7 @@ class Skin(var body: Int, var accessoiries: Int, var hairstyle: Int, var eyes: I
         return other != null 
         && other is Skin 
         && other.body == this.body 
-        && other.accessoiries == this.accessoiries 
+        && other.accessories == this.accessories
         && other.hairstyle == this.hairstyle
         && other.eyes == this.eyes
         && other.outfit == this.outfit
