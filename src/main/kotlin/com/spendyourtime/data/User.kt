@@ -16,7 +16,7 @@ class User(var email: String, var pseudo: String, passwordText: String, var play
         }
         fun checkPassword(pseudo : String, pswText : String) : Boolean{
             var u = findUserByPseudo(pseudo)
-            if(u ==null)
+            if(u == null)
                 throw Exception("Unknwon user")
             return u.password.equals(Hashing.sha256().hashString(pswText, StandardCharsets.UTF_8).toString())
         }
