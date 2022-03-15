@@ -16,15 +16,15 @@ class Skin(var body: Int, var accessoiries: Int, var hairstyle: Int, var eyes: I
     }
 
     init{
-        if(body < minBody && maxBody < body)
+        if(body < minBody || maxBody < body)
             throw Exception("Body must be between " + minBody + " and " + maxBody)
-        if(accessoiries < minAccessoiries && maxAccessoiries < accessoiries)
+        if(accessoiries < minAccessoiries || maxAccessoiries < accessoiries)
             throw Exception("accessoiries must be between " + minAccessoiries + " and " + maxAccessoiries)
-        if(hairstyle < minHairstyle && maxHairstyle < hairstyle)
+        if(hairstyle < minHairstyle || maxHairstyle < hairstyle)
             throw Exception("hairstyle must be between " + minHairstyle + " and " + maxAccessoiries)
-        if(eyes < minEyes && maxEyes < eyes)
+        if(eyes < minEyes || maxEyes < eyes)
             throw Exception("eyes must be between " + minEyes + " and " + maxEyes)
-        if(outfit < minOutfit && maxOutfit < outfit)
+        if(outfit < minOutfit || maxOutfit < outfit)
             throw Exception("outfit must be between " + minOutfit + " and " + maxOutfit)
     }
 
