@@ -1,14 +1,11 @@
 package com.spendyourtime.data
 
-import com.google.common.hash.Hashing
 import com.spendyourtime.helpers.Database
-import java.nio.charset.StandardCharsets
+import com.spendyourtime.helpers.Sha512
 
 class User(var email: String, var pseudo: String, passwordText: String, var player : Player = Player()){
 
-    var password : String = Hashing.sha256()
-        .hashString(passwordText, StandardCharsets.UTF_8)
-        .toString();
+    var password : String = Sha512.encode(passwordText)
 
     init{
         if(Database.allUsers.contains(this))
