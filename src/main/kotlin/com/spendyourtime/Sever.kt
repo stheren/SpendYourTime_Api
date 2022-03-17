@@ -2,6 +2,7 @@ package com.spendyourtime
 
 import com.spendyourtime.data.Guild
 import com.spendyourtime.data.User
+import com.spendyourtime.data.Work
 import com.spendyourtime.helpers.Certification
 import com.spendyourtime.helpers.Database
 import com.spendyourtime.helpers.EmailValidator
@@ -115,7 +116,11 @@ object Server {
                         errors.add("PASSWORD_IS_EMPTY")
                         logger.info("PASSWORD_IS_EMPTY")
                     }
-                    if (!Database.allUsers.checkPassword(ctx.formParam("pseudo").toString(), ctx.formParam("password").toString())) {
+                    if (!Database.allUsers.checkPassword(
+                            ctx.formParam("pseudo").toString(),
+                            ctx.formParam("password").toString()
+                        )
+                    ) {
                         errors.add("PASSWORD_INCORRECT")
                         logger.info("PASSWORD_INCORRECT")
                     }
@@ -158,36 +163,38 @@ object Server {
 
             //Player
             app.post("/Player/position") { ctx ->
-                var errors = arrayListOf<String>()
-                val x = ctx.formParam("posX")?.toInt() ?: -1
-                val y = ctx.formParam("posY")?.toInt() ?: -1
+                Certification.verification(ctx) {
+                    var errors = arrayListOf<String>()
+                    val x = ctx.formParam("posX")?.toInt() ?: -1
+                    val y = ctx.formParam("posY")?.toInt() ?: -1
 
-                logger.info("PlayerPosition")
-                if (ctx.formParam("posX").isNullOrEmpty()) {
-                    errors.add("POSITION_X_ERROR")
-                    logger.info("POSITION_X_ERROR")
-                }
-                if (x < 0 || x > 100) {
-                    errors.add("POSITION_X_NOT_IN_MAP")
-                    logger.info("POSITION_X_NOT_IN_MAP")
-                }
-                if (ctx.formParam("posY").isNullOrEmpty()) {
-                    errors.add("POSITION_Y_ERROR")
-                    logger.info("POSITION_Y_ERROR")
-                }
-                if (y < 0 || y > 100) {
-                    errors.add("POSITION_Y_NOT_IN_MAP")
-                    logger.info("POSITION_Y_NOT_IN_MAP")
-                }
+                    logger.info("PlayerPosition")
+                    if (ctx.formParam("posX").isNullOrEmpty()) {
+                        errors.add("POSITION_X_ERROR")
+                        logger.info("POSITION_X_ERROR")
+                    }
+                    if (x < 0 || x > 100) {
+                        errors.add("POSITION_X_NOT_IN_MAP")
+                        logger.info("POSITION_X_NOT_IN_MAP")
+                    }
+                    if (ctx.formParam("posY").isNullOrEmpty()) {
+                        errors.add("POSITION_Y_ERROR")
+                        logger.info("POSITION_Y_ERROR")
+                    }
+                    if (y < 0 || y > 100) {
+                        errors.add("POSITION_Y_NOT_IN_MAP")
+                        logger.info("POSITION_Y_NOT_IN_MAP")
+                    }
 
-                if (errors.isNotEmpty()) {
-                    ctx.status(400)
-                    ctx.json(errors)
-                    logger.info("ERROR_POSITION")
-                    logger.info("END_POSITION")
-                } else {
-                    ctx.status(200)
-                    ctx.json("SUCCESS_POSITION")
+                    if (errors.isNotEmpty()) {
+                        ctx.status(400)
+                        ctx.json(errors)
+                        logger.info("ERROR_POSITION")
+                        logger.info("END_POSITION")
+                    } else {
+                        ctx.status(200)
+                        ctx.json("SUCCESS_POSITION")
+                    }
                 }
             }
 
@@ -202,8 +209,27 @@ object Server {
                 }
 
                 get("members") { ctx ->
-                    logger.info("GET_ALL_MEMBERS_GUILD")
-                    ctx.status(501)
+                    Certification.verification(ctx) { user ->
+                        logger.info("GET_ALL_MEMBERS_GUILD")
+                        var errors = arrayListOf<String>()
+                        if (ctx.pathParam("nameGuild").toString().isNullOrEmpty()) {
+                            errors.add("NAME_EMPTY")
+                            logger.info("NAME_EMPTY")
+                        }
+                        if (ctx) {
+                            errors.add("")
+                            logger.info("")
+                        }
+
+                        if (errors.isNotEmpty()) {
+                            ctx.status(400)
+                            ctx.json(errors)
+                            logger.info("ERROR_GET_ALL_MEMBERS_GUILD")
+                            logger.info("END_GET_ALL_MEMBERS_GUILD")
+                        } else {
+                            ctx.json()
+                        }
+                    }
                 }
 
                 put("deleteMember") { ctx ->
@@ -214,13 +240,21 @@ object Server {
                     ctx.status(501)
                 }
 
-                post("createGuild") { ctx ->
-                    Certification.verification(ctx) {
+                post("create") { ctx ->
+                    Certification.verification(ctx) { user ->
                         logger.info("POST_GUILD")
                         var errors = arrayListOf<String>()
                         if (ctx.formParam("nameGuild").isNullOrEmpty()) {
                             errors.add("NAME_GUILD_REQUIRED")
                             logger.info("NAME_GUILD_REQUIRED")
+                        }
+                        if (ctx.formParam("typeWork").isNullOrEmpty()) {
+                            errors.add("WORK_REQUIRED")
+                            logger.info("WORK_REQUIRED")
+                        }
+                        if (!Work.validateWork(ctx.formParam("typeWork").toString())) {
+                            errors.add("WORK_INCORRECT")
+                            logger.info("WORK_INCORRECT")
                         }
 
                         if (errors.isNotEmpty()) {
@@ -228,6 +262,11 @@ object Server {
                             ctx.json(errors)
                             logger.info("END_CREATE_GUILD")
                         } else {
+                            Guild(
+                                ctx.formParam("nameGuild").toString(),
+                                user.player,
+                                Work.sendWork(ctx.formParam("typeWork").toString())
+                            )
                             ctx.json("SUCCESS_CREATE_GUILD")
                             ctx.status(201)
                         }
