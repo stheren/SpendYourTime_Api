@@ -2,8 +2,23 @@ package com.spendyourtime.data
 
 class Guild(var name: String, var owner : Player){
 
+    companion object{
+        var allGuilds = arrayListOf<Guild>()
+    }
+
     var employees = arrayListOf<Player>()
     var tasks = arrayListOf<Work>()
+
+    init{
+        for(g in allGuilds){
+            if(g.name == name)
+                throw Exception("This name is already used")
+            if(g.owner.equals(owner))
+                throw Exception("This owner alreagy have a guild")
+        }
+        allGuilds.add(this);
+        
+    }
 
     /**
      * Add task to tasks list
