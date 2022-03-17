@@ -16,6 +16,8 @@ class Position(var x: Int, var y: Int){
             throw Exception("y must be between $minY and $maxY")
     }
 
+    constructor() : this(0,0) {}
+
     override fun equals(other: Any?) : Boolean{
         return other != null 
         && other is Position 

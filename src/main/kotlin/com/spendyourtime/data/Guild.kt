@@ -1,6 +1,6 @@
 package com.spendyourtime.data
 
-class Guild(var name: String, var owner: Player) {
+class Guild(var name: String, var owner: Player, var typeWork : Work) {
 
     companion object {
         var allGuilds = arrayListOf<Guild>()

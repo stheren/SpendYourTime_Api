@@ -17,8 +17,10 @@ class User(var email: String, var pseudo: String, passwordText: String, var play
                 throw Exception("Email already exists")
         }
         Database.allUsers.add(this)
+        Database.saveToJSON()
     }
 
+    constructor() : this("","","") {}
     
 
     override fun equals(other: Any?) : Boolean{
