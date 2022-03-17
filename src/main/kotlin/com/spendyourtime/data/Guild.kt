@@ -20,6 +20,10 @@ class Guild(var name: String, var owner: Player, var typeWork : Work) {
 
     }
 
+    fun IsInGuild(p : Player): Boolean{
+       return employees.any{it == p} || owner == p
+    }
+
     /**
      * Add task to tasks list
      */
