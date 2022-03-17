@@ -18,7 +18,7 @@ object Database {
         }
 
         fun checkPassword(pseudo: String, pswText: String): Boolean {
-            var u = findUserByPseudo(pseudo) ?: throw Exception("Unknwon user")
+            val u = findUserByPseudo(pseudo) ?: throw Exception("Unknwon user")
             return u.password == Sha512.encode(pswText)
         }
     }
