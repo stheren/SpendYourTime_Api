@@ -1,5 +1,6 @@
 package com.spendyourtime
 
+import com.spendyourtime.data.Guild
 import com.spendyourtime.data.Player
 import com.spendyourtime.data.Skin
 import com.spendyourtime.data.User
@@ -144,7 +145,8 @@ object Server {
                     Certification.verification(ctx) { user ->
                         user.player.skin.body = ctx.formParam("body")?.toInt() ?: user.player.skin.body
                         user.player.skin.eyes = ctx.formParam("eyes")?.toInt() ?: user.player.skin.eyes
-                        user.player.skin.accessories = ctx.formParam("accessories")?.toInt() ?: user.player.skin.accessories
+                        user.player.skin.accessories =
+                            ctx.formParam("accessories")?.toInt() ?: user.player.skin.accessories
                         user.player.skin.hairstyle = ctx.formParam("hairstyle")?.toInt() ?: user.player.skin.hairstyle
                         user.player.skin.outfit = ctx.formParam("outfit")?.toInt() ?: user.player.skin.outfit
                         ctx.status(201)
@@ -154,8 +156,7 @@ object Server {
             }
 
             //Player
-            app.post("/Player/position")
-            { ctx ->
+            app.post("/Player/position") { ctx ->
                 var errors = arrayListOf<String>()
                 val x = ctx.formParam("posX")?.toInt() ?: -1
                 val y = ctx.formParam("posY")?.toInt() ?: -1
@@ -190,11 +191,13 @@ object Server {
             }
 
             //Guilde
-            path("Guild")
-            {
+            path("Guild") {
                 get("allGuild") { ctx ->
-                    logger.info("GET_ALL_GUILD")
-                    ctx.status(501)
+                    Certification.verification(ctx) {
+                        logger.info("GET_ALL_GUILD")
+                        ctx.json(Guild.allGuilds)
+                        ctx.status(200)
+                    }
                 }
 
                 get("members") { ctx ->
@@ -202,18 +205,38 @@ object Server {
                     ctx.status(501)
                 }
 
-                post("createGuild") { ctx ->
-                    logger.info("POST_GUILD")
+                put("deleteMember") { ctx ->
                     ctx.status(501)
                 }
 
+                post("addMember") { ctx ->
+                    ctx.status(501)
+                }
 
+                post("createGuild") { ctx ->
+                    Certification.verification(ctx) {
+                        logger.info("POST_GUILD")
+                        var errors = arrayListOf<String>()
+                        if (ctx.formParam("nameGuild").isNullOrEmpty()) {
+                            errors.add("NAME_GUILD_REQUIRED")
+                            logger.info("NAME_GUILD_REQUIRED")
+                        }
+
+                        if (errors.isNotEmpty()) {
+                            ctx.status(400)
+                            ctx.json(errors)
+                            logger.info("END_CREATE_GUILD")
+                        } else {
+                            ctx.json("SUCCESS_CREATE_GUILD")
+                            ctx.status(201)
+                        }
+                    }
+                }
             }
 
 
             //MAP
-            get("map")
-            { ctx ->
+            get("map") { ctx ->
                 logger.info("RECUP_MAP")
                 ctx.status(501)
             }
