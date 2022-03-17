@@ -1,14 +1,14 @@
 package com.spendyourtime
 
 import com.spendyourtime.data.Guild
-import com.spendyourtime.data.Player
-import com.spendyourtime.data.Skin
 import com.spendyourtime.data.User
 import com.spendyourtime.helpers.Certification
+import com.spendyourtime.helpers.Database
 import com.spendyourtime.helpers.EmailValidator
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
 import org.slf4j.LoggerFactory
+import javax.xml.crypto.Data
 
 
 object Server {
@@ -48,7 +48,7 @@ object Server {
                         errors.add("EMAIL_NOT_VALID")
                         logger.info("EMAIL_NOT_VALID")
                     }
-                    if (User.findUserByEmail(ctx.formParam("email").toString()) != null) {
+                    if (Database.findUserByEmail(ctx.formParam("email").toString()) != null) {
                         errors.add("EMAIL_ALREADY_USE")
                         logger.info("EMAIL_ALREADY_USE")
                     }
@@ -66,7 +66,7 @@ object Server {
                         errors.add("PSEUDO_TOO_LONG")
                         logger.info("PSEUDO_TOO_LONG")
                     }
-                    if (User.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
+                    if (Database.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
                         errors.add("PSEUDO_ALREADY_USE")
                         logger.info("PSEUDO_ALREADY_USE")
                     }
@@ -104,7 +104,7 @@ object Server {
                         errors.add("PSEUDO_IS_EMPTY")
                         logger.info("PSEUDO_IS_EMPTY")
                     }
-                    if (User.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
+                    if (Database.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
                         errors.add("PSEUDO_UNKNOW")
                         logger.info("PSEUDO_UNKNOW")
                     }
@@ -114,7 +114,7 @@ object Server {
                         errors.add("PASSWORD_IS_EMPTY")
                         logger.info("PASSWORD_IS_EMPTY")
                     }
-                    if (!User.checkPassword(ctx.formParam("pseudo").toString(), ctx.formParam("password").toString())) {
+                    if (!Database.checkPassword(ctx.formParam("pseudo").toString(), ctx.formParam("password").toString())) {
                         errors.add("PASSWORD_INCORRECT")
                         logger.info("PASSWORD_INCORRECT")
                     }
@@ -124,7 +124,7 @@ object Server {
                         logger.info("FAILED_LOGIN_IN")
                         logger.info("END_OF_LOGIN")
                     } else {
-                        val u = User.findUserByPseudo(ctx.formParam("pseudo").toString())!!
+                        val u = Database.findUserByPseudo(ctx.formParam("pseudo").toString())!!
                         ctx.json(Certification.create(u))
                         ctx.json("Success_Login_in")
                         ctx.status(202)
