@@ -9,7 +9,6 @@ import com.spendyourtime.helpers.EmailValidator
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
 import org.slf4j.LoggerFactory
-import javax.xml.crypto.Data
 
 
 object Server {
@@ -33,24 +32,24 @@ object Server {
         app.routes {
             app.get("/ping") { ctx ->
                 ctx.json("Pong")
-            } //c'est rigolo
+            }
 
             //USER REGISTER + LOGIN
             path("User") {
                 post("register") { ctx ->
                     logger.info("USER_REGISTER")
-                    var errors = arrayListOf<String>()
+                    val errors = arrayListOf<String>()
 
                     //verif mail
                     if (ctx.formParam("email").isNullOrEmpty()) {
                         errors.add("EMAIL_IS_EMPTY")
                         logger.info("EMAIL_IS_EMPTY")
                     }
-                    if (!EmailValidator.isEmailValid(ctx.formParam("email").toString())) {
+                    if (!EmailValidator.isEmailValid(ctx.formParam("email").toString()) && !ctx.formParam("email").isNullOrEmpty()) {
                         errors.add("EMAIL_NOT_VALID")
                         logger.info("EMAIL_NOT_VALID")
                     }
-                    if (Database.allUsers.findUserByEmail(ctx.formParam("email").toString()) != null) {
+                    if (Database.allUsers.findUserByEmail(ctx.formParam("email").toString()) != null && !ctx.formParam("email").isNullOrEmpty()) {
                         errors.add("EMAIL_ALREADY_USE")
                         logger.info("EMAIL_ALREADY_USE")
                     }
@@ -60,7 +59,7 @@ object Server {
                         errors.add("PSEUDO_IS_EMPTY")
                         logger.info("PSEUDO_IS_EMPTY")
                     }
-                    if (ctx.formParam("pseudo").toString().length < 3) {
+                    if (ctx.formParam("pseudo").toString().length < 3 && !ctx.formParam("pseudo").isNullOrEmpty()) {
                         errors.add("PSEUDO_TOO_SHORT")
                         logger.info("PSEUDO_TOO_SHORT")
                     }
@@ -68,7 +67,7 @@ object Server {
                         errors.add("PSEUDO_TOO_LONG")
                         logger.info("PSEUDO_TOO_LONG")
                     }
-                    if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
+                    if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) != null && !ctx.formParam("pseudo").isNullOrEmpty()) {
                         errors.add("PSEUDO_ALREADY_USE")
                         logger.info("PSEUDO_ALREADY_USE")
                     }
@@ -85,7 +84,7 @@ object Server {
                         logger.info("FAILED_OF_REGISTER")
                         logger.info("END_OF_REGISTER")
                     } else {
-                        var u: User = User(
+                        val u: User = User(
                             ctx.formParam("email").toString(),
                             ctx.formParam("pseudo").toString(),
                             ctx.formParam("password").toString()
@@ -99,16 +98,16 @@ object Server {
 
                 post("login") { ctx ->
                     logger.info("POST_LOGIN")
-                    var errors = arrayListOf<String>()
+                    val errors = arrayListOf<String>()
 
                     //Check pseudo login
                     if (ctx.formParam("pseudo").isNullOrEmpty()) {
                         errors.add("PSEUDO_IS_EMPTY")
                         logger.info("PSEUDO_IS_EMPTY")
                     }
-                    if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) != null) {
-                        errors.add("PSEUDO_UNKNOW")
-                        logger.info("PSEUDO_UNKNOW")
+                    if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) != null && !ctx.formParam("pseudo").isNullOrEmpty()) {
+                        errors.add("PSEUDO_UNKNOWN")
+                        logger.info("PSEUDO_UNKNOWN")
                     }
 
                     //check Password login
@@ -120,6 +119,7 @@ object Server {
                             ctx.formParam("pseudo").toString(),
                             ctx.formParam("password").toString()
                         )
+                        && !ctx.formParam("password").isNullOrEmpty()
                     ) {
                         errors.add("PASSWORD_INCORRECT")
                         logger.info("PASSWORD_INCORRECT")
@@ -164,7 +164,7 @@ object Server {
             //Player
             app.post("/Player/position") { ctx ->
                 Certification.verification(ctx) {
-                    var errors = arrayListOf<String>()
+                    val errors = arrayListOf<String>()
                     val x = ctx.formParam("posX")?.toInt() ?: -1
                     val y = ctx.formParam("posY")?.toInt() ?: -1
 
@@ -173,7 +173,7 @@ object Server {
                         errors.add("POSITION_X_ERROR")
                         logger.info("POSITION_X_ERROR")
                     }
-                    if (x < 0 || x > 100) {
+                    if (x < 0 || x > 100 && !ctx.formParam("posX").isNullOrEmpty()) {
                         errors.add("POSITION_X_NOT_IN_MAP")
                         logger.info("POSITION_X_NOT_IN_MAP")
                     }
@@ -181,7 +181,7 @@ object Server {
                         errors.add("POSITION_Y_ERROR")
                         logger.info("POSITION_Y_ERROR")
                     }
-                    if (y < 0 || y > 100) {
+                    if (y < 0 || y > 100 && !ctx.formParam("posY").isNullOrEmpty()) {
                         errors.add("POSITION_Y_NOT_IN_MAP")
                         logger.info("POSITION_Y_NOT_IN_MAP")
                     }
@@ -209,16 +209,12 @@ object Server {
                 }
 
                 get("members") { ctx ->
-                    Certification.verification(ctx) { user ->
+                    Certification.verification(ctx) {
                         logger.info("GET_ALL_MEMBERS_GUILD")
-                        var errors = arrayListOf<String>()
-                        if (ctx.pathParam("nameGuild").toString().isNullOrEmpty()) {
+                        val errors = arrayListOf<String>()
+                        if (ctx.pathParam("nameGuild").isNullOrEmpty()) {
                             errors.add("NAME_EMPTY")
                             logger.info("NAME_EMPTY")
-                        }
-                        if (ctx) {
-                            errors.add("")
-                            logger.info("")
                         }
 
                         if (errors.isNotEmpty()) {
@@ -227,58 +223,88 @@ object Server {
                             logger.info("ERROR_GET_ALL_MEMBERS_GUILD")
                             logger.info("END_GET_ALL_MEMBERS_GUILD")
                         } else {
-                            ctx.json()
+                            ctx.status(200)
+                            ctx.json(Guild.getMembers(Guild.getGuild(ctx.pathParam("nameGuild"))))
                         }
                     }
                 }
 
                 put("deleteMember") { ctx ->
-                    ctx.status(501)
-                }
-
-                post("addMember") { ctx ->
-                    ctx.status(501)
-                }
-
-                post("create") { ctx ->
                     Certification.verification(ctx) { user ->
-                        logger.info("POST_GUILD")
-                        var errors = arrayListOf<String>()
-                        if (ctx.formParam("nameGuild").isNullOrEmpty()) {
-                            errors.add("NAME_GUILD_REQUIRED")
-                            logger.info("NAME_GUILD_REQUIRED")
-                        }
-                        if (ctx.formParam("typeWork").isNullOrEmpty()) {
-                            errors.add("WORK_REQUIRED")
-                            logger.info("WORK_REQUIRED")
-                        }
-                        if (!Work.validateWork(ctx.formParam("typeWork").toString())) {
-                            errors.add("WORK_INCORRECT")
-                            logger.info("WORK_INCORRECT")
+                        logger.info("DELETE_MEMBER_GUILD")
+                        val errors = arrayListOf<String>()
+
+                        if(ctx.formParam("namePlayer").isNullOrEmpty()){
+                            errors.add("NAME_PLAYER_IS_EMPTY")
+                            logger.info("NAME_PLAYER_IS_EMPTY")
                         }
 
                         if (errors.isNotEmpty()) {
                             ctx.status(400)
                             ctx.json(errors)
-                            logger.info("END_CREATE_GUILD")
+                            logger.info("ERROR_DELETE_MEMBER_GUILD")
+                            logger.info("END_DELETE_MEMBER_GUILD")
                         } else {
-                            Guild(
-                                ctx.formParam("nameGuild").toString(),
-                                user.player,
-                                Work.sendWork(ctx.formParam("typeWork").toString())
-                            )
-                            ctx.json("SUCCESS_CREATE_GUILD")
-                            ctx.status(201)
+                            ctx.status(200)
+                            ctx.json("SUCCESS_DELETE_MEMBER_GUILD")
                         }
                     }
+
+                    post("addMember") { ctx ->
+                        Certification.verification(ctx) { user ->
+                            logger.info("ADD_MEMBER_GUILD")
+                            val errors = arrayListOf<String>()
+                            if (errors.isNotEmpty()) {
+                                ctx.status(400)
+                                ctx.json(errors)
+                                logger.info("ERROR_ADD_MEMBER_GUILD")
+                                logger.info("END_ADD_MEMBER_GUILD")
+                            } else {
+                                ctx.status(200)
+                                ctx.json("SUCCESS_ADD_MEMBER_GUILD")
+                            }
+                        }
+
+                        post("create") { ctx ->
+                            Certification.verification(ctx) { user ->
+                                logger.info("POST_GUILD")
+                                val errors = arrayListOf<String>()
+                                if (ctx.formParam("nameGuild").isNullOrEmpty()) {
+                                    errors.add("NAME_GUILD_REQUIRED")
+                                    logger.info("NAME_GUILD_REQUIRED")
+                                }
+                                if (ctx.formParam("typeWork").isNullOrEmpty()) {
+                                    errors.add("WORK_REQUIRED")
+                                    logger.info("WORK_REQUIRED")
+                                }
+                                if (!Work.validateWork(ctx.formParam("typeWork").toString())) {
+                                    errors.add("WORK_INCORRECT")
+                                    logger.info("WORK_INCORRECT")
+                                }
+
+                                if (errors.isNotEmpty()) {
+                                    ctx.status(400)
+                                    ctx.json(errors)
+                                    logger.info("END_CREATE_GUILD")
+                                } else {
+                                    Guild(
+                                        ctx.formParam("nameGuild").toString(),
+                                        user.player,
+                                        Work.sendWork(ctx.formParam("typeWork").toString())
+                                    )
+                                    ctx.json("SUCCESS_CREATE_GUILD")
+                                    ctx.status(201)
+                                }
+                            }
+                        }
+                    }
+
+                    //MAP
+                    get("map") { ctx ->
+                        logger.info("RECUP_MAP")
+                        ctx.status(501)
+                    }
                 }
-            }
-
-
-            //MAP
-            get("map") { ctx ->
-                logger.info("RECUP_MAP")
-                ctx.status(501)
             }
         }
     }

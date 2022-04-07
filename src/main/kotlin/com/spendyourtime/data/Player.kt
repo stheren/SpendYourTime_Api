@@ -2,7 +2,6 @@ package com.spendyourtime.data
 
 
 class Player(var position: Position, var skin: Skin){
-
     constructor() : this(Position(0,0), Skin())
 
     override fun equals(other: Any?) : Boolean{
