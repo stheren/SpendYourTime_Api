@@ -3,11 +3,9 @@ package com.spendyourtime.data
 import com.spendyourtime.helpers.Database
 import com.spendyourtime.helpers.Sha512
 
-class User(var email: String, var pseudo: String, passwordText: String, var player : Player = Player()){
-
-    var password : String = Sha512.encode(passwordText)
-
+data class User(var email: String, var pseudo: String, var password: String, var player : Player = Player()){
     init{
+        password = Sha512.encode(password)
         if(Database.allUsers.contains(this))
             throw Exception("Player already in allUsers")
         for(user in Database.allUsers){
