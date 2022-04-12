@@ -1,6 +1,7 @@
 package com.spendyourtime.helpers
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.spendyourtime.data.Guild
 import com.spendyourtime.data.User
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -9,11 +10,11 @@ import java.nio.file.Paths
 object Database {
     class Users : ArrayList<User>(){
         fun findUserByPseudo(pseudo: String): User? {
-            return allUsers.find { it.pseudo == pseudo }
+            return find { it.pseudo == pseudo }
         }
 
         fun findUserByEmail(email: String): User? {
-            return allUsers.find { it.email == email }
+            return find { it.email == email }
         }
 
         fun checkPassword(pseudo: String, pswText: String): Boolean {
@@ -27,18 +28,32 @@ object Database {
         }
     }
 
+    class Guilds : ArrayList<Guild>(){
+        fun findGuildByName(name: String): Guild? {
+            return find { it.name == name }
+        }
+
+        fun addGuild(guild: Guild) {
+            add(guild)
+            saveToJSON()
+        }
+    }
+
     val logger = LoggerFactory.getLogger(this::class.java)
     val mapper = ObjectMapper()
 
     var allUsers = Users()
+    var allGuilds = Guilds()
 
     fun loadFromJSON(){
         logger.info("LOAD_FROM_JSON")
         allUsers = mapper.readValue(Paths.get("users.json").toFile(), Users::class.java)
+        allGuilds = mapper.readValue(Paths.get("guilds.json").toFile(), Guilds::class.java)
     }
 
     fun saveToJSON(){
         logger.info("SAVE_FROM_JSON")
-        mapper.writeValue(Paths.get("users.json").toFile(), allUsers);
+        mapper.writeValue(Paths.get("users.json").toFile(), allUsers)
+        mapper.writeValue(Paths.get("guilds.json").toFile(), allGuilds)
     }
 }
