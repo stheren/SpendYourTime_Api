@@ -46,6 +46,10 @@ object Database {
             return filter { it.owner == userOwner.player }
         }
 
+        fun findAllGuildByMember(userMember: User): List<Guild> {
+            return filter { it.employees.contains(userMember.player) }
+        }
+
         fun addGuild(guild: Guild) {
             add(guild)
             saveToJSON()
