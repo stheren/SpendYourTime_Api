@@ -33,6 +33,10 @@ object Database {
             return find { it.name == name }
         }
 
+        fun findAllGuildsByOwner(userOwner: User): List<Guild> {
+            return filter { it.owner == userOwner.player }
+        }
+
         fun addGuild(guild: Guild) {
             add(guild)
             saveToJSON()
