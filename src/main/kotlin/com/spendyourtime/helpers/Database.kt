@@ -23,6 +23,7 @@ object Database {
 
         fun addUser(user: User) {
             allUsers.add(user)
+            saveToJSON()
         }
     }
 
@@ -34,8 +35,6 @@ object Database {
     fun loadFromJSON(){
         logger.info("LOAD_FROM_JSON")
         allUsers = mapper.readValue(Paths.get("users.json").toFile(), Users::class.java)
-
-        Database.saveToJSON()
     }
 
     fun saveToJSON(){
