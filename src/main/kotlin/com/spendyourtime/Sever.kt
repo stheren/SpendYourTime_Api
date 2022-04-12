@@ -105,8 +105,12 @@ object Server {
                     if (ctx.formParam("pseudo").isNullOrEmpty()) {
                         errors.add("PSEUDO_IS_EMPTY")
                         logger.info("PSEUDO_IS_EMPTY")
+                        return@post
                     }
-                    if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) != null && !ctx.formParam("pseudo").isNullOrEmpty()) {
+
+                    logger.info(Database.allUsers.findUserByPseudo(ctx.formParam("pseudo")!!).toString())
+
+                    if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) == null) {
                         errors.add("PSEUDO_UNKNOWN")
                         logger.info("PSEUDO_UNKNOWN")
                     }
@@ -133,7 +137,6 @@ object Server {
                     } else {
                         val u = Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString())!!
                         ctx.json(Certification.create(u))
-                        ctx.json("Success_Login_in")
                         ctx.status(202)
                     }
                 }
@@ -225,7 +228,7 @@ object Server {
                             logger.info("END_GET_ALL_MEMBERS_GUILD")
                         } else {
                             ctx.status(200)
-                            ctx.json(Guild.getMembers(Guild.getGuild(ctx.pathParam("nameGuild"))))
+                            //ctx.json(Guild.getMembers(Guild.getGuild(ctx.pathParam("nameGuild"))))
                         }
                     }
                 }
