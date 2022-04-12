@@ -20,6 +20,10 @@ object Database {
             val u = findUserByPseudo(pseudo) ?: throw Exception("Unknwon user")
             return u.password == Sha512.encode(pswText)
         }
+
+        fun addUser(user: User) {
+            allUsers.add(user)
+        }
     }
 
     val logger = LoggerFactory.getLogger(this::class.java)
@@ -30,6 +34,8 @@ object Database {
     fun loadFromJSON(){
         logger.info("LOAD_FROM_JSON")
         allUsers = mapper.readValue(Paths.get("users.json").toFile(), Users::class.java)
+
+        Database.saveToJSON()
     }
 
     fun saveToJSON(){

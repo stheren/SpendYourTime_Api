@@ -14,8 +14,6 @@ data class User(var email: String, var pseudo: String, var password: String, var
             if(user.email == this.email)
                 throw Exception("Email already exists")
         }
-        Database.allUsers.add(this)
-        Database.saveToJSON()
     }
 
     constructor() : this("","","") {}

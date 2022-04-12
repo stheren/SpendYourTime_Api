@@ -89,6 +89,7 @@ object Server {
                             ctx.formParam("pseudo").toString(),
                             ctx.formParam("password").toString()
                         )
+                        Database.allUsers.addUser(u)
                         ctx.status(201)
                         ctx.json(Certification.create(u))
                         logger.info("SUCCESS_REGISTER")
