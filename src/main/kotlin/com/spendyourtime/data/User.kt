@@ -4,6 +4,16 @@ import com.spendyourtime.helpers.Database
 import com.spendyourtime.helpers.Sha512
 
 data class User(var email: String, var pseudo: String, var password: String, var player : Player = Player()){
+
+    companion object{
+        var autoincrement: Int = 0
+        get() {
+            field++
+            return field
+        }
+    }
+    // Create a autoincrement id
+    var id: Int = autoincrement
     init{
         password = Sha512.encode(password)
         if(Database.allUsers.contains(this))
