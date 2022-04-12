@@ -42,14 +42,14 @@ TYPE | PATH | ROUTE | DESCRIPTION | PARAMETERS | RESPONSE
 ![GET] | `/Guild` | `/` | return all guilds data | `header : {token}`  | `Array of {guild}`
 ![POST] | `/Guild` | `/` | create guild | `header : {token}` `form-data : {name, typeOfWork}`  | `SUCCESS MESSAGE`
 ![GET] | `/Guild` | `/:id` | return guild data | `header : {token}`  | `{guild}`
-![PUT] | `/Guild` | `/:id` | update guild data | `header : {token}` `form-data : {guild}`  | `SUCCESS MESSAGE`
+![PUT] | `/Guild` | `/:id` | update guild data | `header : {token}` `form-data : {name, typeOfWork}`  | `SUCCESS MESSAGE`
 ![DELETE] | `/Guild` | `/:id` | delete guild | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Guild` | `/:id/join` | join waiting list of guild | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Guild` | `/:id/leave` | leave guild | `header : {token}`  | `SUCCESS MESSAGE`
+![PATCH] | `/Guild` | `/:id/join` | join waiting list of guild | `header : {token}`  | `SUCCESS MESSAGE`
+![PATCH] | `/Guild` | `/:id/leave` | leave guild | `header : {token}`  | `SUCCESS MESSAGE`
 ![GET] | `/Guild` | `/:id/owner` | return owner of guild | `header : {token}`  | `{User}`
 ![GET] | `/Guild` | `/:id/members` | return members of guild | `header : {token}`  | `{Array of User}`
 ![GET] | `/Guild` | `/:id/waiting` | return waiting members of guild | `header : {token}`  | `{Array of User}`
-![GET] | `/Guild` | `/:id/accept` | accept member of guild | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Guild` | `/:id/decline` | decline member of guild | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Guild` | `/:id/kick` | kick member of guild | `header : {token}`  | `SUCCESS MESSAGE`
+![PATCH] | `/Guild` | `/:id/accept/:player` | accept member of guild | `header : {token}`  | `SUCCESS MESSAGE`
+![PATCH] | `/Guild` | `/:id/decline/:player` | decline member of guild | `header : {token}`  | `SUCCESS MESSAGE`
+![GET] | `/Guild` | `/:id/kick/:player` | kick member of guild | `header : {token}`  | `SUCCESS MESSAGE`
 ![GET] | `/Map` | `/` | return map | `nothing` | `matrix[3][X][Y]`

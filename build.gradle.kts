@@ -28,7 +28,6 @@ dependencies {
     implementation("io.github.nefilim.kjwt:kjwt-core:0.5.1")
     implementation("io.github.nefilim.kjwt:kjwt-google-kms-grpc:0.5.1")
     implementation("io.github.nefilim.kjwt:kjwt-jwks:0.5.1")
-
 }
 
 application {

@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory
 
 
 object Server {
-
     @JvmStatic
     fun main(args: Array<String>) {
         val logger = LoggerFactory.getLogger(this::class.java)
@@ -28,8 +27,6 @@ object Server {
                 ctx.json("Error")
             }
         }.start(7000)
-
-
         app.routes {
 
             //LOGIN
@@ -129,7 +126,7 @@ object Server {
                     }
                 }
 
-                get("/:id") { ctx ->
+                get("/{id}") { ctx ->
                     Certification.verification(ctx) {
                         val datauser = Database.allUsers.findUserById(ctx.pathParam("id").toInt())
                         if (datauser == null) {
@@ -312,7 +309,7 @@ object Server {
                     }
                 }
 
-                get("/:id") { ctx ->
+                get("/{id}") { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_GUILD")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -327,7 +324,7 @@ object Server {
                     }
                 }
 
-                put("/:id") { ctx ->
+                put("/{id}") { ctx ->
                     Certification.verification(ctx) {
                         logger.info("PUT_GUILD")
                         var name = ctx.formParam("nameGuild") ?: ""
@@ -366,7 +363,7 @@ object Server {
                     }
                 }
 
-                delete("/:id") { ctx ->
+                delete("/{id}") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("DELETE_GUILD")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -387,7 +384,7 @@ object Server {
                     }
                 }
 
-                patch("/:id/join") { ctx ->
+                patch("/{id}/join") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerJoinGuild")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -404,7 +401,7 @@ object Server {
                     }
                 }
 
-                patch("/:id/leave") { ctx ->
+                patch("/{id}/leave") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerLeaveGuild")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -425,7 +422,7 @@ object Server {
                     }
                 }
 
-                get("/:id/owner") { ctx ->
+                get("/{id}/owner") { ctx ->
                     Certification.verification(ctx) {
                         logger.info("OwnerGuild")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -436,7 +433,7 @@ object Server {
                     }
                 }
 
-                get("/:id/members") { ctx ->
+                get("/{id}/members") { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_MEMBERS")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -452,7 +449,7 @@ object Server {
                     }
                 }
 
-                get("/:id/waiting") { ctx ->
+                get("/{id}/waiting") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GET_WAITING_LIST")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -472,7 +469,7 @@ object Server {
                     }
                 }
 
-                patch("/:id/accept/:playerId") { ctx ->
+                patch("/{id}/accept/{playerId}") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("ACCEPT_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -507,7 +504,7 @@ object Server {
                     }
                 }
 
-                patch("/id:/decline/:playerId") { ctx ->
+                patch("/id:/decline/{playerId}") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("REFUSE_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -541,7 +538,7 @@ object Server {
                     }
                 }
 
-                patch("/:id/kick/:playerId") { ctx ->
+                patch("/{id}/kick/{playerId}") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("KICK_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
