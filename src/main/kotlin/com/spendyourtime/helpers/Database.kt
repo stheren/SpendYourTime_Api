@@ -30,6 +30,11 @@ object Database {
         fun findUserById(id: Int): User? {
             return find { it.id == id }
         }
+
+        fun removeUser(user: User) {
+            allUsers.remove(user)
+            saveToJSON()
+        }
     }
 
     class Guilds : ArrayList<Guild>(){

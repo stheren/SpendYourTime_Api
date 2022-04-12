@@ -32,13 +32,13 @@ TYPE | PATH | ROUTE | DESCRIPTION | PARAMETERS | RESPONSE
 ![POST]| | `/register` | register user | `Form-data : {email, pseudo, password}` | `{token}`
 ![GET] | `/User` | `/` | return user data | `header : {token}`  | `{pseudo, email, player}`
 ![GET] | `/User` | `/:id` | return user data | `header : {token}`  | `{pseudo, email, player}`
-![PUT] | `/User` | `/:id` | update user data | `header : {token}` `form-data : {pseudo, email, player}`  | `SUCCESS MESSAGE`
+![PUT] | `/User` | `/` | update user data | `header : {token}` `form-data : {pseudo, email, password}`  | `SUCCESS MESSAGE`
 ![DELETE] | `/User` | `/` | delete user | `header : {token}`  | `SUCCESS MESSAGE`
 ![GET] | `/Player`| `/skin` | return skin data | `header : {token}`  | `{skin}`
 ![PUT] | `/Player` | `/skin` | update skin data | `header : {token}` `form-data : {body, eyes, accessories, hairstyle, outfit}`  | `SUCCESS MESSAGE`
 ![PUT] | `/Player` | `/position` | update position data | `header : {token}` `form-data : {x, y}`  | `SUCCESS MESSAGE`
-![GET] | `/Player` | '/guilds' | return guilds data | `header : {token}`  | `{array of guilds}`
-![GET] | `/Player` | '/own' | return own guilds data | `header : {token}`  | `{array of guilds}`
+![GET] | `/Player` | `/guilds` | return guilds data | `header : {token}`  | `{array of guilds}`
+![GET] | `/Player` | `/own` | return own guilds data | `header : {token}`  | `{array of guilds}`
 ![GET] | `/Guild` | `/` | return guild data | `header : {token}`  | `Array of {guild}`
 ![POST] | `/Guild` | `/` | create guild | `header : {token}` `form-data : {name, typeOfWork}`  | `SUCCESS MESSAGE`
 ![GET] | `/Guild` | `/:id` | return guild data | `header : {token}`  | `{guild}`
@@ -52,3 +52,4 @@ TYPE | PATH | ROUTE | DESCRIPTION | PARAMETERS | RESPONSE
 ![GET] | `/Guild` | `/:id/accept` | accept member of guild | `header : {token}`  | `SUCCESS MESSAGE`
 ![GET] | `/Guild` | `/:id/decline` | decline member of guild | `header : {token}`  | `SUCCESS MESSAGE`
 ![GET] | `/Guild` | `/:id/kick` | kick member of guild | `header : {token}`  | `SUCCESS MESSAGE`
+![GET] | `/Map` | `/` | return map | `nothing` | `matrix[3][X][Y]`
