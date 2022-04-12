@@ -32,100 +32,183 @@ object Server {
 
         app.routes {
 
-            //USER ROUTES
-            path("User") {
-                post("register") { ctx ->
-                    logger.info("USER_REGISTER")
+            //LOGIN
+            app.post("/login") { ctx ->
+                logger.info("POST_LOGIN")
 
-                    //verif mail
-                    if (ctx.formParam("email").isNullOrEmpty()) {
-                        ctx.retour(400, "EMAIL_EMPTY")
-                        return@post
-                    }
-                    if (!EmailValidator.isEmailValid(ctx.formParam("email").toString()) && !ctx.formParam("email")
-                            .isNullOrEmpty()
-                    ) {
-                        ctx.retour(400, "EMAIL_INVALID")
-                        return@post
-                    }
-                    if (Database.allUsers.findUserByEmail(
-                            ctx.formParam("email").toString()
-                        ) != null && !ctx.formParam("email").isNullOrEmpty()
-                    ) {
-                        ctx.retour(400, "EMAIL_ALREADY_EXIST")
-                        return@post
-                    }
-
-                    //verif pseudo
-                    if (ctx.formParam("pseudo").isNullOrEmpty()) {
-                        ctx.retour(400, "PSEUDO_EMPTY")
-                        return@post
-                    }
-                    if (ctx.formParam("pseudo").toString().length < 3 && !ctx.formParam("pseudo").isNullOrEmpty()) {
-                        ctx.retour(400, "PSEUDO_TOO_SHORT")
-                        return@post
-                    }
-                    if (ctx.formParam("pseudo").toString().length > 12) {
-                        ctx.retour(400, "PSEUDO_TOO_LONG")
-                        return@post
-                    }
-                    if (Database.allUsers.findUserByPseudo(
-                            ctx.formParam("pseudo").toString()
-                        ) != null && !ctx.formParam("pseudo").isNullOrEmpty()
-                    ) {
-                        ctx.retour(400, "PSEUDO_ALREADY_EXIST")
-                        return@post
-                    }
-
-                    //verif password
-                    if (ctx.formParam("password").isNullOrEmpty()) {
-                        ctx.retour(400, "PASSWORD_EMPTY")
-                        return@post
-                    }
-
-                    val u: User = User(
-                        ctx.formParam("email").toString(),
-                        ctx.formParam("pseudo").toString(),
-                        ctx.formParam("password").toString()
-                    )
-                    Database.allUsers.addUser(u)
-                    ctx.retour(201, Certification.create(u))
+                //Check pseudo login
+                if (ctx.formParam("pseudo").isNullOrEmpty()) {
+                    ctx.retour(400, "PSEUDO_IS_EMPTY")
+                    return@post
+                }
+                if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) == null) {
+                    ctx.retour(400, "PSEUDO_NOT_EXIST")
+                    return@post
                 }
 
-                post("login") { ctx ->
-                    logger.info("POST_LOGIN")
+                //check Password login
+                if (ctx.formParam("password").isNullOrEmpty()) {
+                    ctx.retour(400, "PASSWORD_IS_EMPTY")
+                    return@post
+                }
+                if (!Database.allUsers.checkPassword(
+                        ctx.formParam("pseudo").toString(), ctx.formParam("password").toString()
+                    )
+                ) {
+                    ctx.retour(400, "PASSWORD_NOT_VALID")
+                    return@post
+                }
+                val u = Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString())!!
+                ctx.retour(200, Certification.create(u))
+            }
 
-                    //Check pseudo login
-                    if (ctx.formParam("pseudo").isNullOrEmpty()) {
-                        ctx.retour(400, "PSEUDO_IS_EMPTY")
-                        return@post
+            //REGISTER
+            app.post("/register") { ctx ->
+                logger.info("USER_REGISTER")
+
+                //verif mail
+                if (ctx.formParam("email").isNullOrEmpty()) {
+                    ctx.retour(400, "EMAIL_EMPTY")
+                    return@post
+                }
+                if (!EmailValidator.isEmailValid(ctx.formParam("email").toString())) {
+                    ctx.retour(400, "EMAIL_INVALID")
+                    return@post
+                }
+                if (Database.allUsers.findUserByEmail(ctx.formParam("email").toString()) != null) {
+                    ctx.retour(400, "EMAIL_ALREADY_EXIST")
+                    return@post
+                }
+
+                //verif pseudo
+                if (ctx.formParam("pseudo").isNullOrEmpty()) {
+                    ctx.retour(400, "PSEUDO_EMPTY")
+                    return@post
+                }
+                if (ctx.formParam("pseudo").toString().length < 3) {
+                    ctx.retour(400, "PSEUDO_TOO_SHORT")
+                    return@post
+                }
+                if (ctx.formParam("pseudo").toString().length > 12) {
+                    ctx.retour(400, "PSEUDO_TOO_LONG")
+                    return@post
+                }
+                if (Database.allUsers.findUserByPseudo(
+                        ctx.formParam("pseudo").toString()
+                    ) != null
+                ) {
+                    ctx.retour(400, "PSEUDO_ALREADY_EXIST")
+                    return@post
+                }
+
+                //verif password
+                if (ctx.formParam("password").isNullOrEmpty()) {
+                    ctx.retour(400, "PASSWORD_EMPTY")
+                    return@post
+                }
+
+                if (ctx.formParam("password").toString().length < 2) {
+                    ctx.retour(400, "PASSWORD_TOO_SHORT")
+                    return@post
+                }
+
+                val u: User = User(
+                    ctx.formParam("email").toString(),
+                    ctx.formParam("pseudo").toString(),
+                    ctx.formParam("password").toString()
+                )
+                Database.allUsers.addUser(u)
+                ctx.retour(201, Certification.create(u))
+            }
+
+            //USER ROUTES
+            path("User") {
+                get("/") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        ctx.retour(200, user)
                     }
-                    if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) == null) {
-                        ctx.retour(400, "PSEUDO_NOT_EXIST")
-                        return@post
+                }
+
+                get("/:id") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        val datauser = Database.allUsers.findUserById(ctx.pathParam("id").toInt())
+                        if (datauser == null) {
+                            ctx.retour(404, "USER_NOT_FOUND")
+                            return@verification
+                        }
+                        ctx.retour(200, datauser)
+                    }
+                }
+
+                //modify user pseudo, email or password
+                put("/") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        var email = ctx.formParam("email").toString()
+                        var pseudo = ctx.formParam("pseudo").toString()
+                        var password = ctx.formParam("password").toString()
+
+
+                        if (pseudo.isNullOrEmpty()) {
+                            pseudo = user.pseudo
+                        } else {
+                            if (pseudo.length < 3) {
+                                ctx.retour(400, "PSEUDO_TOO_SHORT")
+                                return@verification
+                            }
+                            if (pseudo.length > 12) {
+                                ctx.retour(400, "PSEUDO_TOO_LONG")
+                                return@verification
+                            }
+                            if (Database.allUsers.findUserByPseudo(pseudo) != null) {
+                                ctx.retour(400, "PSEUDO_ALREADY_EXIST")
+                                return@verification
+                            }
+                        }
+
+                        if (email.isNullOrEmpty()) {
+                            email = user.email
+                        } else {
+                            if (!EmailValidator.isEmailValid(email)) {
+                                ctx.retour(400, "EMAIL_INVALID")
+                                return@verification
+                            }
+                            if (Database.allUsers.findUserByEmail(email) != null) {
+                                ctx.retour(400, "EMAIL_ALREADY_EXIST")
+                                return@verification
+                            }
+                        }
+
+                        if (password.isNullOrEmpty()) {
+                            password = user.password
+                        } else {
+                            if (password.length < 2) {
+                                ctx.retour(400, "PASSWORD_TOO_SHORT")
+                                return@verification
+                            }
+                        }
+                        user.pseudo = pseudo
+                        user.email = email
+                        user.password = password
+                        Database.saveToJSON()
+                        ctx.retour(200, "USER_MODIFIED")
                     }
 
-                    //check Password login
-                    if (ctx.formParam("password").isNullOrEmpty()) {
-                        ctx.retour(400, "PASSWORD_IS_EMPTY")
-                        return@post
+                }
+
+                delete("/") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        Database.allUsers.removeUser(user)
+                        Database.saveToJSON()
+                        ctx.retour(200, "USER_DELETED")
                     }
-                    if (!Database.allUsers.checkPassword(
-                            ctx.formParam("pseudo").toString(), ctx.formParam("password").toString()
-                        ) && !ctx.formParam("password").isNullOrEmpty()
-                    ) {
-                        ctx.retour(400, "PASSWORD_NOT_VALID")
-                        return@post
-                    }
-                    val u = Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString())!!
-                    ctx.retour(200, Certification.create(u))
                 }
             }
 
+
             //Player
             path("/Player") {
-                post("position") { ctx ->
-                    Certification.verification(ctx) {
+                put("/position") { ctx ->
+                    Certification.verification(ctx) { user ->
                         val x = ctx.formParam("posX")?.toInt() ?: -1
                         val y = ctx.formParam("posY")?.toInt() ?: -1
 
@@ -146,11 +229,13 @@ object Server {
                             ctx.retour(400, "POSY_IS_NOT_VALID")
                             return@verification
                         }
+                        user.player.position.x = x
+                        user.player.position.y = y
                         ctx.retour(201, "POSITION_CHANGED")
                     }
                 }
 
-                get("skin") { ctx ->
+                get("/skin") { ctx ->
                     logger.info("GET_SKIN")
                     Certification.verification(ctx) { user ->
                         ctx.retour(200, user.player.skin)
@@ -158,59 +243,54 @@ object Server {
 
                 }
 
-                app.put("skin") { ctx ->
+                put("/skin") { ctx ->
                     logger.info("CHANGE_SKIN_PLAYER")
                     Certification.verification(ctx) { user ->
                         user.player.skin.body = ctx.formParam("body")?.toInt() ?: user.player.skin.body
                         user.player.skin.eyes = ctx.formParam("eyes")?.toInt() ?: user.player.skin.eyes
                         user.player.skin.accessories =
                             ctx.formParam("accessories")?.toInt() ?: user.player.skin.accessories
-                        user.player.skin.hairstyle = ctx.formParam("hairstyle")?.toInt() ?: user.player.skin.hairstyle
+                        user.player.skin.hairstyle =
+                            ctx.formParam("hairstyle")?.toInt() ?: user.player.skin.hairstyle
                         user.player.skin.outfit = ctx.formParam("outfit")?.toInt() ?: user.player.skin.outfit
                         ctx.retour(200, user.player.skin)
                     }
                 }
 
-
-                post("joinGuild") { ctx ->
+                get("/guilds") { ctx ->
                     Certification.verification(ctx) { user ->
-                        val guild = ctx.formParam("guild")?.toString() ?: ""
-
-                        logger.info("PlayerJoinGuild")
-                        if (ctx.formParam("guild").isNullOrEmpty()) {
-                            ctx.retour(400, "GUILD_EMPTY")
+                        if (Database.allGuilds.findAllGuildByMember(user).isEmpty()) {
+                            ctx.retour(200, "NO_GUILD")
                             return@verification
+                        } else {
+                            ctx.retour(200, Database.allGuilds.findAllGuildByMember(user))
                         }
-
-                        if (Database.allGuilds.findGuildByName(guild) == null) {
-                            ctx.retour(400, "GUILD_NOT_FOUND")
-                            return@verification
-                        }
-                        Database.allGuilds.findGuildByName(guild)?.AddMember(user.player)
-                        ctx.retour(200, "SUCCESS_JOIN_GUILD")
                     }
                 }
 
-                post("/leaveGuild") { ctx ->
+                get("/owns") { ctx ->
                     Certification.verification(ctx) { user ->
-                        val guild = ctx.formParam("guild")?.toString() ?: ""
-
-                        logger.info("PlayerLeaveGuild")
-                        if (ctx.formParam("guild").isNullOrEmpty()) {
-                            ctx.retour(400, "GUILD_EMPTY")
-                            return@verification
+                        logger.info("GET_OWNER_GUILD")
+                        if (Database.allGuilds.findAllGuildsByOwner(user).isEmpty()) {
+                            ctx.retour(400, "NO_OWNER_GUILD")
+                        } else {
+                            ctx.retour(200, Database.allGuilds.findAllGuildsByOwner(user))
                         }
+                    }
+                }
+            }
 
-                        if (Database.allGuilds.findGuildByName(guild) == null) {
-                            ctx.retour(400, "GUILD_NOT_EXIST")
-                            return@verification
-                        }
-                        Database.allGuilds.findGuildByName(guild)?.RemoveMember(user.player)
-                        ctx.retour(200, "SUCCESS_LEAVE_GUILD")
+
+            //Guilde
+            path("Guild") {
+                get("/") { ctx ->
+                    Certification.verification(ctx) {
+                        logger.info("GET_ALL_GUILD")
+                        ctx.retour(200, Database.allGuilds)
                     }
                 }
 
-                post("/createGuild") { ctx ->
+                post("/") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("POST_GUILD")
                         if (ctx.formParam("nameGuild").isNullOrEmpty()) {
@@ -232,37 +312,154 @@ object Server {
                     }
                 }
 
-                get("/ownerGuild") { ctx ->
-                    Certification.verification(ctx) { user ->
-                        logger.info("GET_OWNER_GUILD")
-                        if (Database.allGuilds.findAllGuildsByOwner(user).isEmpty()) {
-                            ctx.retour(400, "NO_OWNER_GUILD")
-                        } else {
-                            ctx.retour(200, Database.allGuilds.findAllGuildsByOwner(user))
-                        }
-                    }
-                }
-            }
-
-
-            //Guilde
-            path("Guild") {
-                get("allGuild") { ctx ->
+                get("/:id") { ctx ->
                     Certification.verification(ctx) {
-                        logger.info("GET_ALL_GUILD")
-                        ctx.retour(200, Database.allGuilds)
+                        logger.info("GET_GUILD")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
+                            return@verification
+                        }
+                        if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            return@verification
+                        }
+                        ctx.retour(200, Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!)
                     }
                 }
 
-                get("waitingList") { ctx ->
+                put("/:id") { ctx ->
                     Certification.verification(ctx) { user ->
-                        logger.info("GET_WAITING_LIST")
-                        val guild = ctx.formParam("guild")?.toString() ?: ""
-                        if (guild.isNullOrEmpty()) {
+                        logger.info("PUT_GUILD")
+                        var name = ctx.formParam("nameGuild")?.toString() ?: ""
+                        var work = ctx.formParam("typeWork")?.toString() ?: ""
+
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
+                            return@verification
+                        }
+                        val guild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                        if (guild == null) {
+                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            return@verification
+                        }
+
+                        if (name.isNullOrEmpty()) {
+                            name = guild.name
+                        } else {
+                            if (Database.allGuilds.findGuildByName(name) != null) {
+                                ctx.retour(400, "GUILD_ALREADY_EXIST")
+                                return@verification
+                            }
+                        }
+
+                        if (work.isNullOrEmpty()) {
+                            work = guild.typeWork.name
+                        } else {
+                            if (!Work.validateWork(work)) {
+                                ctx.retour(400, "TYPE_WORK_NOT_EXIST")
+                                return@verification
+                            }
+                        }
+                        guild.name = name
+                        guild.typeWork = Work.sendWork(work)
+                        ctx.retour(200, "SUCCESS_UPDATE_GUILD")
+                    }
+                }
+
+                delete("/:id") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("DELETE_GUILD")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
+                            return@verification
+                        }
+                        if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            return@verification
+                        }
+                        if (!Database.allGuilds.findAllGuildsByOwner(user)
+                                .contains(Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()))
+                        ) {
+                            ctx.retour(400, "GUILD_NOT_OWNER")
+                        }
+                        Database.allGuilds.remove(Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()))
+                        ctx.retour(200, "SUCCESS_DELETE_GUILD")
+                    }
+                }
+
+                patch("/:id/join") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("PlayerJoinGuild")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                            ctx.retour(400, "GUILD_EMPTY")
+                            return@verification
+                        }
+
+                        if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            return@verification
+                        }
+                        Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.AddMember(user.player)
+                        ctx.retour(200, "SUCCESS_JOIN_WAITING_LIST")
+                    }
+                }
+
+                patch("/:id/leave") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("PlayerLeaveGuild")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                            ctx.retour(400, "GUILD_EMPTY")
+                            return@verification
+                        }
+
+                        if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            return@verification
+                        }
+                        if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                                ?.RemoveMember(user.player) != true
+                        ) {
+                            ctx.retour(400, "PLAYER_NOT_IN_GUILD_OR_IS_OWNER")
+                        }
+                        ctx.retour(200, "SUCCESS_LEAVE_WAITING_LIST")
+                    }
+                }
+
+                get("/:id/owner") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("OwnerGuild")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                            ctx.retour(400, "GUILD_EMPTY")
+                            return@verification
+                        }
+                        Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.let { ctx.retour(200, it.owner) }
+                    }
+                }
+
+                get("/:id/members") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("GET_ALL_MEMBERS")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
-                        val dataguild = Database.allGuilds.findGuildByName(guild)
+                        val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                        if (dataguild == null) {
+                            ctx.retour(404, "GUILD_NOT_EXIST")
+                            return@verification
+                        }
+                        ctx.retour(200, dataguild.employees)
+                    }
+                }
+
+                get("/:id/waiting") { ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("GET_WAITING_LIST")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                            ctx.retour(400, "GUILD_REQUIRED")
+                            return@verification
+                        }
+                        val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                         if (dataguild == null) {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
@@ -275,20 +472,23 @@ object Server {
                     }
                 }
 
-                post("acceptMember") { ctx ->
+                patch("/:id/accept/:playerId") { ctx ->
                     Certification.verification(ctx) { user ->
-                        logger.info("POST_ACCEPT_MEMBER")
-                        val guild = ctx.formParam("guild")?.toString() ?: ""
-                        val player = ctx.formParam("playerName")?.toString() ?: ""
-                        if (guild.isNullOrEmpty()) {
+                        logger.info("ACCEPT_MEMBER")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
-                        if (player.isNullOrEmpty()) {
+                        if (ctx.pathParam("playerId").isNullOrEmpty()) {
                             ctx.retour(400, "PLAYER_REQUIRED")
                             return@verification
                         }
-                        val dataguild = Database.allGuilds.findGuildByName(guild)
+                        val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
+                        if (datauser == null) {
+                            ctx.retour(400, "PLAYER_NOT_FOUND")
+                            return@verification
+                        }
+                        val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                         if (dataguild == null) {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
@@ -297,34 +497,33 @@ object Server {
                             ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
                             return@verification
                         }
-                        if (Database.allUsers.findUserByPseudo(player) == null) {
-                            ctx.retour(404, "PLAYER_NOT_EXIST")
-                            return@verification
-                        }
-                        if (!dataguild.waitingList.contains(Database.allUsers.findUserByPseudo(player)!!.player)) {
+                        if (!dataguild.waitingList.contains(datauser.player)) {
                             ctx.retour(404, "PLAYER_NOT_WAITING_LIST")
                             return@verification
                         }
-                        dataguild.AddMember(Database.allUsers.findUserByPseudo(player)!!.player)
-                        dataguild.waitingList.remove(Database.allUsers.findUserByPseudo(player)!!.player)
+                        dataguild.AddMember(datauser.player)
+                        dataguild.waitingList.remove(datauser.player)
                         ctx.retour(200, "SUCCESS_ACCEPT_MEMBER")
                     }
                 }
 
-                post("refuseMember") { ctx ->
+                patch("/id:/decline/:playerId") { ctx ->
                     Certification.verification(ctx) { user ->
-                        logger.info("POST_REFUSE_MEMBER")
-                        val guild = ctx.formParam("guild")?.toString() ?: ""
-                        val player = ctx.formParam("playerName")?.toString() ?: ""
-                        if (guild.isNullOrEmpty()) {
+                        logger.info("REFUSE_MEMBER")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
-                        if (player.isNullOrEmpty()) {
+                        if (ctx.pathParam("playerId").isNullOrEmpty()) {
                             ctx.retour(400, "PLAYER_REQUIRED")
                             return@verification
                         }
-                        val dataguild = Database.allGuilds.findGuildByName(guild)
+                        val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
+                        if (datauser == null) {
+                            ctx.retour(400, "PLAYER_NOT_FOUND")
+                            return@verification
+                        }
+                        val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                         if (dataguild == null) {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
@@ -333,33 +532,32 @@ object Server {
                             ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
                             return@verification
                         }
-                        if (Database.allUsers.findUserByPseudo(player) == null) {
-                            ctx.retour(404, "PLAYER_NOT_EXIST")
-                            return@verification
-                        }
-                        if (!dataguild.waitingList.contains(Database.allUsers.findUserByPseudo(player)!!.player)) {
+                        if (!dataguild.waitingList.contains(datauser.player)) {
                             ctx.retour(404, "PLAYER_NOT_WAITING_LIST")
                             return@verification
                         }
-                        dataguild.waitingList.remove(Database.allUsers.findUserByPseudo(player)!!.player)
+                        dataguild.waitingList.remove(datauser.player)
                         ctx.retour(200, "SUCCESS_REFUSE_MEMBER")
                     }
                 }
 
-                post("removeMember") { ctx ->
+                patch("/:id/kick/:playerId") { ctx ->
                     Certification.verification(ctx) { user ->
-                        logger.info("POST_REMOVE_MEMBER")
-                        val guild = ctx.formParam("guild")?.toString() ?: ""
-                        val player = ctx.formParam("playerName")?.toString() ?: ""
-                        if (guild.isNullOrEmpty()) {
+                        logger.info("KICK_MEMBER")
+                        if (ctx.pathParam("id").isNullOrEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
-                        if (player.isNullOrEmpty()) {
+                        if (ctx.pathParam("playerId").isNullOrEmpty()) {
                             ctx.retour(400, "PLAYER_REQUIRED")
                             return@verification
                         }
-                        val dataguild = Database.allGuilds.findGuildByName(guild)
+                        val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
+                        if (datauser == null) {
+                            ctx.retour(400, "PLAYER_NOT_FOUND")
+                            return@verification
+                        }
+                        val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                         if (dataguild == null) {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
@@ -368,39 +566,14 @@ object Server {
                             ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
                             return@verification
                         }
-                        if (Database.allUsers.findUserByPseudo(player) == null) {
-                            ctx.retour(404, "PLAYER_NOT_EXIST")
-                            return@verification
+                        if (!dataguild.employees.contains(datauser.player)) {
+                            ctx.retour(404, "PLAYER_NOT_MEMBER_GUILD")
                         }
-                        if (!dataguild.employees.contains(Database.allUsers.findUserByPseudo(player)!!.player)) {
-                            ctx.retour(404, "PLAYER_NOT_MEMBER")
-                            return@verification
-                        }
-                        dataguild.RemoveMember(Database.allUsers.findUserByPseudo(player)!!.player)
-                        ctx.retour(200, "SUCCESS_REMOVE_MEMBER")
+                        dataguild.employees.remove(datauser.player)
+                        ctx.retour(200, "SUCCESS_KICK_MEMBER")
                     }
                 }
 
-                get("allMembers") { ctx ->
-                    Certification.verification(ctx) { user ->
-                        logger.info("GET_ALL_MEMBERS")
-                        val guild = ctx.formParam("guild")?.toString() ?: ""
-                        if (guild.isNullOrEmpty()) {
-                            ctx.retour(400, "GUILD_REQUIRED")
-                            return@verification
-                        }
-                        val dataguild = Database.allGuilds.findGuildByName(guild)
-                        if (dataguild == null) {
-                            ctx.retour(404, "GUILD_NOT_EXIST")
-                            return@verification
-                        }
-                        if (dataguild.owner != user.player) {
-                            ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
-                            return@verification
-                        }
-                        ctx.retour(200, dataguild.employees)
-                    }
-                }
             }
 
 
