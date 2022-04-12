@@ -3,6 +3,17 @@ package com.spendyourtime.data
 import com.spendyourtime.helpers.Database
 
 class Guild(var name: String, var owner: Player, var typeWork : Work) {
+
+    companion object{
+        private var autoincrement: Int = 0
+            get() {
+                field++
+                return field
+            }
+    }
+    // Create a autoincrement id
+    var id: Int = autoincrement
+
     var waitingList = arrayListOf<Player>()
     var employees = arrayListOf<Player>()
     var tasks = arrayListOf<Work>()

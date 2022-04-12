@@ -54,6 +54,10 @@ object Database {
             add(guild)
             saveToJSON()
         }
+
+        fun findGuildById(id: Int): Guild? {
+            return find { it.id == id }
+        }
     }
 
     val logger = LoggerFactory.getLogger(this::class.java)

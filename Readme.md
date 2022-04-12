@@ -38,8 +38,8 @@ TYPE | PATH | ROUTE | DESCRIPTION | PARAMETERS | RESPONSE
 ![PUT] | `/Player` | `/skin` | update skin data | `header : {token}` `form-data : {body, eyes, accessories, hairstyle, outfit}`  | `SUCCESS MESSAGE`
 ![PUT] | `/Player` | `/position` | update position data | `header : {token}` `form-data : {x, y}`  | `SUCCESS MESSAGE`
 ![GET] | `/Player` | `/guilds` | return guilds data | `header : {token}`  | `{array of guilds}`
-![GET] | `/Player` | `/own` | return own guilds data | `header : {token}`  | `{array of guilds}`
-![GET] | `/Guild` | `/` | return guild data | `header : {token}`  | `Array of {guild}`
+![GET] | `/Player` | `/owns` | return own guilds data | `header : {token}`  | `{array of guilds}`
+![GET] | `/Guild` | `/` | return all guilds data | `header : {token}`  | `Array of {guild}`
 ![POST] | `/Guild` | `/` | create guild | `header : {token}` `form-data : {name, typeOfWork}`  | `SUCCESS MESSAGE`
 ![GET] | `/Guild` | `/:id` | return guild data | `header : {token}`  | `{guild}`
 ![PUT] | `/Guild` | `/:id` | update guild data | `header : {token}` `form-data : {guild}`  | `SUCCESS MESSAGE`
