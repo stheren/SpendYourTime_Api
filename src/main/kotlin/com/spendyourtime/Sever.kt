@@ -130,7 +130,7 @@ object Server {
                 }
 
                 get("/:id") { ctx ->
-                    Certification.verification(ctx) { user ->
+                    Certification.verification(ctx) {
                         val datauser = Database.allUsers.findUserById(ctx.pathParam("id").toInt())
                         if (datauser == null) {
                             ctx.retour(404, "USER_NOT_FOUND")
@@ -148,7 +148,7 @@ object Server {
                         var password = ctx.formParam("password").toString()
 
 
-                        if (pseudo.isNullOrEmpty()) {
+                        if (pseudo.isEmpty()) {
                             pseudo = user.pseudo
                         } else {
                             if (pseudo.length < 3) {
@@ -165,7 +165,7 @@ object Server {
                             }
                         }
 
-                        if (email.isNullOrEmpty()) {
+                        if (email.isEmpty()) {
                             email = user.email
                         } else {
                             if (!EmailValidator.isEmailValid(email)) {
@@ -178,7 +178,7 @@ object Server {
                             }
                         }
 
-                        if (password.isNullOrEmpty()) {
+                        if (password.isEmpty()) {
                             password = user.password
                         } else {
                             if (password.length < 2) {
@@ -315,7 +315,7 @@ object Server {
                 get("/:id") { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_GUILD")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             return@verification
                         }
@@ -328,12 +328,12 @@ object Server {
                 }
 
                 put("/:id") { ctx ->
-                    Certification.verification(ctx) { user ->
+                    Certification.verification(ctx) {
                         logger.info("PUT_GUILD")
-                        var name = ctx.formParam("nameGuild")?.toString() ?: ""
-                        var work = ctx.formParam("typeWork")?.toString() ?: ""
+                        var name = ctx.formParam("nameGuild") ?: ""
+                        var work = ctx.formParam("typeWork") ?: ""
 
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             return@verification
                         }
@@ -343,7 +343,7 @@ object Server {
                             return@verification
                         }
 
-                        if (name.isNullOrEmpty()) {
+                        if (name.isEmpty()) {
                             name = guild.name
                         } else {
                             if (Database.allGuilds.findGuildByName(name) != null) {
@@ -352,7 +352,7 @@ object Server {
                             }
                         }
 
-                        if (work.isNullOrEmpty()) {
+                        if (work.isEmpty()) {
                             work = guild.typeWork.name
                         } else {
                             if (!Work.validateWork(work)) {
@@ -369,7 +369,7 @@ object Server {
                 delete("/:id") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("DELETE_GUILD")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             return@verification
                         }
@@ -390,7 +390,7 @@ object Server {
                 patch("/:id/join") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerJoinGuild")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_EMPTY")
                             return@verification
                         }
@@ -407,7 +407,7 @@ object Server {
                 patch("/:id/leave") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerLeaveGuild")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_EMPTY")
                             return@verification
                         }
@@ -426,9 +426,9 @@ object Server {
                 }
 
                 get("/:id/owner") { ctx ->
-                    Certification.verification(ctx) { user ->
+                    Certification.verification(ctx) {
                         logger.info("OwnerGuild")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_EMPTY")
                             return@verification
                         }
@@ -437,9 +437,9 @@ object Server {
                 }
 
                 get("/:id/members") { ctx ->
-                    Certification.verification(ctx) { user ->
+                    Certification.verification(ctx) {
                         logger.info("GET_ALL_MEMBERS")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
@@ -455,7 +455,7 @@ object Server {
                 get("/:id/waiting") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GET_WAITING_LIST")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
@@ -475,11 +475,11 @@ object Server {
                 patch("/:id/accept/:playerId") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("ACCEPT_MEMBER")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
-                        if (ctx.pathParam("playerId").isNullOrEmpty()) {
+                        if (ctx.pathParam("playerId").isEmpty()) {
                             ctx.retour(400, "PLAYER_REQUIRED")
                             return@verification
                         }
@@ -510,11 +510,11 @@ object Server {
                 patch("/id:/decline/:playerId") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("REFUSE_MEMBER")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
-                        if (ctx.pathParam("playerId").isNullOrEmpty()) {
+                        if (ctx.pathParam("playerId").isEmpty()) {
                             ctx.retour(400, "PLAYER_REQUIRED")
                             return@verification
                         }
@@ -544,11 +544,11 @@ object Server {
                 patch("/:id/kick/:playerId") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("KICK_MEMBER")
-                        if (ctx.pathParam("id").isNullOrEmpty()) {
+                        if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "GUILD_REQUIRED")
                             return@verification
                         }
-                        if (ctx.pathParam("playerId").isNullOrEmpty()) {
+                        if (ctx.pathParam("playerId").isEmpty()) {
                             ctx.retour(400, "PLAYER_REQUIRED")
                             return@verification
                         }
