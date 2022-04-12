@@ -23,12 +23,15 @@ class Guild(var name: String, var owner: Player, var typeWork : Work) {
         /**
          * take a guild and return all the players in the guild
          */
-        fun getMembers(guild: Guild): ArrayList<Player> {
+        fun getMembers(): ArrayList<Player> {
             var bob = arrayListOf<Player>()
             return bob
         }
+
+
     }
 
+    var waitingList = arrayListOf<Player>()
     var employees = arrayListOf<Player>()
     var tasks = arrayListOf<Work>()
 
@@ -74,10 +77,22 @@ class Guild(var name: String, var owner: Player, var typeWork : Work) {
     fun AddMember(p: Player): Boolean {
         if (owner.equals(p) || employees.contains(p))
             return false
-        employees.add(p)
+        waitingList.add(p)
         return true
     }
 
+    fun AcceptMember(p: Player) {
+        if (waitingList.contains(p)) {
+            employees.add(p)
+            waitingList.remove(p)
+        }
+    }
+
+    fun RemoveFromWaitingList(p: Player) {
+        if (waitingList.contains(p)) {
+            waitingList.remove(p)
+        }
+    }
     /**
      * Remove a player from a guild
      * Return false if it's the owner or if p is not in the guild
