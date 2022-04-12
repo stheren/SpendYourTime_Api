@@ -26,6 +26,10 @@ object Database {
             allUsers.add(user)
             saveToJSON()
         }
+
+        fun findUserById(id: Int): User? {
+            return find { it.id == id }
+        }
     }
 
     class Guilds : ArrayList<Guild>(){
