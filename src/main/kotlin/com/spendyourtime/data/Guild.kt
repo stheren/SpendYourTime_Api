@@ -2,7 +2,7 @@ package com.spendyourtime.data
 
 import com.spendyourtime.helpers.Database
 
-class Guild(var name: String, var owner: Player, var typeWork : Work) {
+class Guild(var name: String, var owner: User, var typeWork : Work) {
 
     companion object{
         private fun getUniqueID(): Int {
@@ -16,8 +16,10 @@ class Guild(var name: String, var owner: Player, var typeWork : Work) {
     // Create a autoincrement id
     var id: Int = getUniqueID()
 
-    var waitingList = arrayListOf<Player>()
-    var employees = arrayListOf<Player>()
+    var place = Map()
+
+    var waitingList = arrayListOf<User>()
+    var employees = arrayListOf<User>()
     var tasks = arrayListOf<Work>()
 
     init {
@@ -29,8 +31,8 @@ class Guild(var name: String, var owner: Player, var typeWork : Work) {
         }
     }
 
-    fun IsInGuild(p : Player): Boolean{
-       return employees.any{it == p} || owner == p
+    fun IsInGuild(u : User): Boolean{
+       return employees.any{it == u} || owner == u
     }
 
     /**
@@ -57,34 +59,34 @@ class Guild(var name: String, var owner: Player, var typeWork : Work) {
      * Add a member to a guild
      * Return false if it's the owner or if p is already in the guild
      */
-    fun AddMember(p: Player): Boolean {
-        if (owner.equals(p) || employees.contains(p))
+    fun AddMember(u: User): Boolean {
+        if (owner.equals(u) || employees.contains(u))
             return false
-        waitingList.add(p)
+        waitingList.add(u)
         return true
     }
 
-    fun AcceptMember(p: Player) {
-        if (waitingList.contains(p)) {
-            employees.add(p)
-            waitingList.remove(p)
+    fun AcceptMember(u: User) {
+        if (waitingList.contains(u)) {
+            employees.add(u)
+            waitingList.remove(u)
         }
     }
 
-    fun RemoveFromWaitingList(p: Player) {
-        if (waitingList.contains(p)) {
-            waitingList.remove(p)
+    fun RemoveFromWaitingList(u: User) {
+        if (waitingList.contains(u)) {
+            waitingList.remove(u)
         }
     }
     /**
      * Remove a player from a guild
      * Return false if it's the owner or if p is not in the guild
      */
-    fun RemoveMember(p: Player): Boolean {
-        if (p.equals(owner))
+    fun RemoveMember(u: User): Boolean {
+        if (u.equals(owner))
             return false
-        if (employees.contains(p)) {
-            employees.remove(p)
+        if (employees.contains(u)) {
+            employees.remove(u)
             return true
         }
         return false

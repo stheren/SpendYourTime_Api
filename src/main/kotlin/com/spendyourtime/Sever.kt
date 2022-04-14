@@ -292,7 +292,7 @@ object Server {
                 post("/") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("POST_GUILD")
-                        if (ctx.formParam("nameGuild").isNullOrEmpty()) {
+                        if (ctx.formParam("name").isNullOrEmpty()) {
                             ctx.retour(400, "NAME_GUILD_REQUIRED")
                             return@verification
                         }
@@ -302,10 +302,12 @@ object Server {
                         if (!Work.validateWork(ctx.formParam("typeWork").toString())) {
                             ctx.retour(400, "TYPE_WORK_NOT_EXIST")
                         }
-                        Guild(
-                            ctx.formParam("nameGuild").toString(),
-                            user.player,
-                            Work.sendWork(ctx.formParam("typeWork").toString())
+                        Database.allGuilds.addGuild(
+                            Guild(
+                                ctx.formParam("name").toString(),
+                                user,
+                                Work.sendWork(ctx.formParam("typeOfWork").toString())
+                            )
                         )
                         ctx.retour(200, "SUCCESS_CREATE_GUILD")
                     }
@@ -398,7 +400,7 @@ object Server {
                             ctx.retour(400, "GUILD_NOT_FOUND")
                             return@verification
                         }
-                        Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.AddMember(user.player)
+                        Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.AddMember(user)
                         ctx.retour(200, "SUCCESS_JOIN_WAITING_LIST")
                     }
                 }
@@ -416,7 +418,7 @@ object Server {
                             return@verification
                         }
                         if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
-                                ?.RemoveMember(user.player) != true
+                                ?.RemoveMember(user) != true
                         ) {
                             ctx.retour(400, "PLAYER_NOT_IN_GUILD_OR_IS_OWNER")
                         }
@@ -463,7 +465,7 @@ object Server {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
                         }
-                        if (dataguild.owner != user.player) {
+                        if (dataguild.owner != user) {
                             ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
                             return@verification
                         }
@@ -492,16 +494,16 @@ object Server {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
                         }
-                        if (dataguild.owner != user.player) {
+                        if (dataguild.owner != user) {
                             ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
                             return@verification
                         }
-                        if (!dataguild.waitingList.contains(datauser.player)) {
+                        if (!dataguild.waitingList.contains(datauser)) {
                             ctx.retour(404, "PLAYER_NOT_WAITING_LIST")
                             return@verification
                         }
-                        dataguild.AddMember(datauser.player)
-                        dataguild.waitingList.remove(datauser.player)
+                        dataguild.AddMember(datauser)
+                        dataguild.waitingList.remove(datauser)
                         ctx.retour(200, "SUCCESS_ACCEPT_MEMBER")
                     }
                 }
@@ -527,15 +529,15 @@ object Server {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
                         }
-                        if (dataguild.owner != user.player) {
+                        if (dataguild.owner != user) {
                             ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
                             return@verification
                         }
-                        if (!dataguild.waitingList.contains(datauser.player)) {
+                        if (!dataguild.waitingList.contains(datauser)) {
                             ctx.retour(404, "PLAYER_NOT_WAITING_LIST")
                             return@verification
                         }
-                        dataguild.waitingList.remove(datauser.player)
+                        dataguild.waitingList.remove(datauser)
                         ctx.retour(200, "SUCCESS_REFUSE_MEMBER")
                     }
                 }
@@ -561,14 +563,14 @@ object Server {
                             ctx.retour(404, "GUILD_NOT_EXIST")
                             return@verification
                         }
-                        if (dataguild.owner != user.player) {
+                        if (dataguild.owner != user) {
                             ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
                             return@verification
                         }
-                        if (!dataguild.employees.contains(datauser.player)) {
+                        if (!dataguild.employees.contains(datauser)) {
                             ctx.retour(404, "PLAYER_NOT_MEMBER_GUILD")
                         }
-                        dataguild.employees.remove(datauser.player)
+                        dataguild.employees.remove(datauser)
                         ctx.retour(200, "SUCCESS_KICK_MEMBER")
                     }
                 }
@@ -576,15 +578,15 @@ object Server {
             }
 
             //Chat
-            path("/Chat"){
-                get("/"){ ctx -> //List last message from 5 minutes
+            path("/Chat") {
+                get("/") { ctx -> //List last message from 5 minutes
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_CHAT")
                         ctx.retour(200, Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time))
                     }
                 }
 
-                post("/create"){ ctx ->
+                post("/create") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("CREATE_MESSAGE_CHAT")
                         val message = ctx.formParam("message")

@@ -44,11 +44,11 @@ object Database {
         }
 
         fun findAllGuildsByOwner(userOwner: User): List<Guild> {
-            return filter { it.owner == userOwner.player }
+            return filter { it.owner == userOwner }
         }
 
         fun findAllGuildByMember(userMember: User): List<Guild> {
-            return filter { it.employees.contains(userMember.player) }
+            return filter { it.employees.contains(userMember) }
         }
 
         fun addGuild(guild: Guild) {
