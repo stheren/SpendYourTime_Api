@@ -5,14 +5,16 @@ import com.spendyourtime.helpers.Database
 class Guild(var name: String, var owner: Player, var typeWork : Work) {
 
     companion object{
-        private var autoincrement: Int = 0
-            get() {
-                field++
-                return field
+        private fun getUniqueID(): Int {
+            var key = 0
+            while (Database.allGuilds.any { it.id == key }) {
+                key++
             }
+            return key
+        }
     }
     // Create a autoincrement id
-    var id: Int = autoincrement
+    var id: Int = getUniqueID()
 
     var waitingList = arrayListOf<Player>()
     var employees = arrayListOf<Player>()

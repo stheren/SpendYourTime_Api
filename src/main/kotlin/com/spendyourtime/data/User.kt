@@ -5,15 +5,17 @@ import com.spendyourtime.helpers.Sha512
 
 data class User(var email: String, var pseudo: String, var password: String, var player : Player = Player()){
 
-    companion object{
-        private var autoincrement: Int = 0
-        get() {
-            field++
-            return field
+    companion object {
+        private fun getUniqueID(): Int {
+            var key = 0
+            while (Database.allUsers.any { it.id == key }) {
+                key++
+            }
+            return key
         }
     }
-    // Create a autoincrement id
-    var id: Int = autoincrement
+
+    var id: Int = getUniqueID()
     init{
         password = Sha512.encode(password)
         if(Database.allUsers.contains(this))
