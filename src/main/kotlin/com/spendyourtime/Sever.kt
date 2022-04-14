@@ -10,6 +10,7 @@ import com.spendyourtime.helpers.retour
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
 import org.slf4j.LoggerFactory
+import java.util.*
 
 
 object Server {
@@ -571,6 +572,18 @@ object Server {
                     }
                 }
 
+            }
+
+            //Chat
+            path("/Chat"){
+                get("/"){ ctx -> //List last message from 5 minutes
+                    Certification.verification(ctx) { user ->
+                        logger.info("GET_ALL_CHAT")
+                        Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time).forEach {
+                            ctx.retour(200, it)
+                        }
+                    }
+                }
             }
 
 
