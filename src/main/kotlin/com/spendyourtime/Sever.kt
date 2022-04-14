@@ -506,7 +506,7 @@ object Server {
                     }
                 }
 
-                patch("/id:/decline/{playerId}") { ctx ->
+                patch("/{id}/decline/{playerId}") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("REFUSE_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
