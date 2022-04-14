@@ -52,4 +52,6 @@ TYPE | PATH | ROUTE | DESCRIPTION | PARAMETERS | RESPONSE
 ![PATCH] | `/Guild` | `/:id/accept/:player` | accept member of guild | `header : {token}`  | `SUCCESS MESSAGE`
 ![PATCH] | `/Guild` | `/:id/decline/:player` | decline member of guild | `header : {token}`  | `SUCCESS MESSAGE`
 ![GET] | `/Guild` | `/:id/kick/:player` | kick member of guild | `header : {token}`  | `SUCCESS MESSAGE`
+![GET] | `/Chat` | `/` | List last message from 5 minutes | `header : {token}` | `{Array of User}`
+![POST] | `/Chat` | `/create` | add message to chat | `header : token` | `SUCCESS MESSAGE`
 ![GET] | `/Map` | `/` | return map | `nothing` | `matrix[3][X][Y]`
