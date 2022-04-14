@@ -189,7 +189,7 @@ object Server {
                         user.email = email
                         user.password = password
                         Database.saveToJSON()
-                        ctx.retour(200, "USER_MODIFIED")
+                        ctx.retour(200, Certification.create(user))
                     }
 
                 }
