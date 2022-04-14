@@ -1,6 +1,7 @@
 package com.spendyourtime
 
 import com.spendyourtime.data.Guild
+import com.spendyourtime.data.Message
 import com.spendyourtime.data.User
 import com.spendyourtime.data.Work
 import com.spendyourtime.helpers.Certification
@@ -582,6 +583,19 @@ object Server {
                         Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time).forEach {
                             ctx.retour(200, it)
                         }
+                    }
+                }
+
+                post("/create"){ ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("CREATE_MESSAGE_CHAT")
+                        val message = ctx.formParam("message")
+                        if (message.isNullOrEmpty()) {
+                            ctx.retour(400, "MESSAGE_REQUIRED")
+                            return@verification
+                        }
+                        Database.allChat.addMessage(Message(message, user, Date().time))
+                        ctx.retour(200, "SUCCESS_CREATE_MESSAGE_CHAT")
                     }
                 }
             }
