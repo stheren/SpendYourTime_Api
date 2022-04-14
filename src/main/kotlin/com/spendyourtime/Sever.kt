@@ -580,9 +580,7 @@ object Server {
                 get("/"){ ctx -> //List last message from 5 minutes
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_CHAT")
-                        Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time).forEach {
-                            ctx.retour(200, it)
-                        }
+                        ctx.retour(200, Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time))
                     }
                 }
 
