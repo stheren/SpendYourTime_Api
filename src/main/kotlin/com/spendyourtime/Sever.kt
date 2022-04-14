@@ -578,7 +578,7 @@ object Server {
             //Chat
             path("/Chat"){
                 get("/"){ ctx -> //List last message from 5 minutes
-                    Certification.verification(ctx) { user ->
+                    Certification.verification(ctx) {
                         logger.info("GET_ALL_CHAT")
                         Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time).forEach {
                             ctx.retour(200, it)
