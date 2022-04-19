@@ -595,13 +595,51 @@ object Server {
                         ctx.retour(200, "SUCCESS_CREATE_MESSAGE_CHAT")
                     }
                 }
+
+                get("/all") { ctx ->
+                    Certification.verification(ctx) {
+                        logger.info("GET_ALL_CHAT")
+                        ctx.retour(200, Database.allChat)
+                    }
+                }
             }
 
 
             //MAP
-            app.get("map") { ctx ->
-                logger.info("RECUP_MAP")
-                ctx.status(501)
+            path("/Map"){
+                get("/"){ ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("GET_CURRENT_MAP_FOR_USER")
+                        val current = Database.allGuilds.findGuildById(user.player.currentGuildMap)
+                        if(current == null){
+                            ctx.retour(404, "PLAYER_IS_NOT_IN_ANY_MAP")
+                            return@verification
+                        }
+                        ctx.retour(200, current.place)
+                    }
+                }
+
+                patch("{id}/go"){ ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("GO_TO_MAP")
+                        val id = ctx.pathParam("id").toInt()
+                        val guild = Database.allGuilds.findGuildById(id)
+                        if(guild == null){
+                            ctx.retour(404, "GUILD_MAP_NOT_EXIST")
+                            return@verification
+                        }
+                        user.player.currentGuildMap = id
+                        ctx.retour(200, "SUCCESS_GO_TO_MAP")
+                    }
+                }
+
+                patch("quit"){ ctx ->
+                    Certification.verification(ctx) { user ->
+                        logger.info("QUIT_MAP")
+                        user.player.currentGuildMap = -1
+                        ctx.retour(200, "SUCCESS_QUIT_MAP")
+                    }
+                }
             }
         }
     }
