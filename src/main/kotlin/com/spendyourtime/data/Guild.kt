@@ -29,9 +29,9 @@ class Guild(var name: String, var owner: User, var typeWork: Work) {
     init {
         for (g in Database.allGuilds) {
             if (g.name == name)
-                throw Exception("This name is already used")
+                throw Exception("NAME_ALREADY_EXIST")
             if (g.owner.equals(owner))
-                throw Exception("This owner alreagy have a guild")
+                throw Exception("OWNER_ALREADY_HAVE_GUILD")
         }
     }
 

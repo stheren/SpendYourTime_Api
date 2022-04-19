@@ -19,15 +19,15 @@ class Skin(var body: Int, var accessories: Int, var hairstyle: Int, var eyes: In
 
     init{
         if(body !in minBody until maxBody)
-            throw Exception("Body must be between $minBody and $maxBody")
+            throw Exception("INVALID_BODY")
         if(accessories !in minAccessories until maxAccessories)
-            throw Exception("accessoiries must be between $minAccessories and $maxAccessories")
+            throw Exception("INVALID_ACCESSORIES")
         if(hairstyle !in minHairstyle until maxHairstyle)
-            throw Exception("hairstyle must be between $minHairstyle and $maxAccessories")
+            throw Exception("INVALID_HAIRSTYLE")
         if(eyes !in minEyes until maxEyes)
-            throw Exception("eyes must be between $minEyes and $maxEyes")
+            throw Exception("INVALID_EYES")
         if(outfit !in minOutfit until maxOutfit)
-            throw Exception("outfit must be between $minOutfit and $maxOutfit")
+            throw Exception("INVALID_OUTFIT")
     }
 
 

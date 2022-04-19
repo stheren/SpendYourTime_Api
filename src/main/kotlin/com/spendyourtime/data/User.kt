@@ -19,12 +19,12 @@ data class User(var email: String, var pseudo: String, var password: String, var
     init{
         password = Sha512.encode(password)
         if(Database.allUsers.contains(this))
-            throw Exception("Player already in allUsers")
+            throw Exception("USER_ALREADY_EXIST")
         for(user in Database.allUsers){
             if (user.pseudo == this.pseudo)
-                throw Exception("Pseudo already exists")
+                throw Exception("PSEUDO_ALREADY_EXIST")
             if(user.email == this.email)
-                throw Exception("Email already exists")
+                throw Exception("EMAIL_ALREADY_EXIST")
         }
     }
 

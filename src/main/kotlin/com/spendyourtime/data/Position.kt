@@ -11,9 +11,9 @@ class Position(var x: Int, var y: Int){
 
     init {
         if(x !in minX until maxX)
-            throw Exception("x must be between $minX and $maxX")
+            throw Exception("INVALID_X")
         if(y !in minY until maxY)
-            throw Exception("y must be between $minY and $maxY")
+            throw Exception("INVALID_Y")
     }
 
     constructor() : this(0,0) {}
