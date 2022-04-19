@@ -1,9 +1,13 @@
 package com.spendyourtime.data
 
+import com.spendyourtime.helpers.Database
+
 class Map {
     var background : MutableList<MutableList<Int>> = MutableList(10) { MutableList(10) { 0 } }
     var foreground : MutableList<MutableList<Int>> = MutableList(10) { MutableList(10) { 0 } }
     var objects : MutableList<MutableList<Int>> = MutableList(10) { MutableList(10) { 0 } }
+
+    var players  : MutableList<Player> = arrayListOf()
 
     init {
         for (i in 0..9) {
@@ -15,7 +19,11 @@ class Map {
         }
     }
 
-
+    fun get(l : List<Player>) : Map {
+        players.clear()
+        players.addAll(l)
+        return this
+    }
 
 
 }

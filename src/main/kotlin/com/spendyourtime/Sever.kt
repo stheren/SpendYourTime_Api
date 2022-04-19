@@ -293,11 +293,13 @@ object Server {
                             ctx.retour(400, "NAME_GUILD_REQUIRED")
                             return@verification
                         }
-                        if (ctx.formParam("typeWork").isNullOrEmpty()) {
+                        if (ctx.formParam("typeOfWork").isNullOrEmpty()) {
                             ctx.retour(400, "TYPE_WORK_REQUIRED")
+                            return@verification
                         }
-                        if (!Work.validateWork(ctx.formParam("typeWork").toString())) {
+                        if (!Work.validateWork(ctx.formParam("typeOfWork").toString())) {
                             ctx.retour(400, "TYPE_WORK_NOT_EXIST")
+                            return@verification
                         }
                         Database.allGuilds.addGuild(
                             Guild(

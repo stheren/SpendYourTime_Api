@@ -2,9 +2,9 @@ package com.spendyourtime.data
 
 import com.spendyourtime.helpers.Database
 
-class Guild(var name: String, var owner: User, var typeWork : Work) {
+class Guild(var name: String, var owner: User, var typeWork: Work) {
 
-    companion object{
+    companion object {
         private fun getUniqueID(): Int {
             var key = 0
             while (Database.allGuilds.any { it.id == key }) {
@@ -13,10 +13,14 @@ class Guild(var name: String, var owner: User, var typeWork : Work) {
             return key
         }
     }
+
     // Create a autoincrement id
     var id: Int = getUniqueID()
 
     var place = Map()
+        get() {
+            return field.get(Database.allUsers.filter { it.player.currentGuildMap == this.id }.map { it.player })
+        }
 
     var waitingList = arrayListOf<User>()
     var employees = arrayListOf<User>()
@@ -31,8 +35,8 @@ class Guild(var name: String, var owner: User, var typeWork : Work) {
         }
     }
 
-    fun IsInGuild(u : User): Boolean{
-       return employees.any{it == u} || owner == u
+    fun IsInGuild(u: User): Boolean {
+        return employees.any { it == u } || owner == u
     }
 
     /**
@@ -78,6 +82,7 @@ class Guild(var name: String, var owner: User, var typeWork : Work) {
             waitingList.remove(u)
         }
     }
+
     /**
      * Remove a player from a guild
      * Return false if it's the owner or if p is not in the guild
