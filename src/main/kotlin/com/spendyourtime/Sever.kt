@@ -205,24 +205,28 @@ object Server {
             path("/Player") {
                 put("/position") { ctx ->
                     Certification.verification(ctx) { user ->
+
+
+                        logger.info("PlayerPosition")
+                        if (ctx.formParam("posX").toString().isNullOrEmpty()) {
+                            ctx.retour(400, "POSX_IS_EMPTY")
+                            return@verification
+                        }
+
+                        if (ctx.formParam("posY").toString().isNullOrEmpty()) {
+                            ctx.retour(400, "POSY_IS_EMPTY")
+                            return@verification
+                        }
+
                         val x = ctx.formParam("posX")?.toInt() ?: -1
                         val y = ctx.formParam("posY")?.toInt() ?: -1
 
-                        logger.info("PlayerPosition")
-                        if (x == -1) {
-                            ctx.retour(400, "POSX_IS_EMPTY")
+                        if (y < 0 || y > 100 && !ctx.formParam("posY").isNullOrEmpty()) {
+                            ctx.retour(400, "POSY_IS_NOT_VALID")
                             return@verification
                         }
                         if (x < 0 || x > 100 && !ctx.formParam("posX").isNullOrEmpty()) {
                             ctx.retour(400, "POSX_IS_NOT_VALID")
-                            return@verification
-                        }
-                        if (y == -1) {
-                            ctx.retour(400, "POSY_IS_EMPTY")
-                            return@verification
-                        }
-                        if (y < 0 || y > 100 && !ctx.formParam("posY").isNullOrEmpty()) {
-                            ctx.retour(400, "POSY_IS_NOT_VALID")
                             return@verification
                         }
                         user.player.position.x = x
