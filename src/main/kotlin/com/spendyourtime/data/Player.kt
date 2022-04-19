@@ -1,8 +1,8 @@
 package com.spendyourtime.data
 
 
-class Player(var position: Position, var skin: Skin){
-    constructor() : this(Position(0,0), Skin())
+class Player(var name: String, var position: Position, var skin: Skin) {
+    constructor() : this("", Position(0,0), Skin())
 
     var currentGuildMap = -1
 
@@ -16,8 +16,8 @@ class Player(var position: Position, var skin: Skin){
         return result
     }
 
-    fun toJSON() : String{
-        return "{\"position\": ${position.toJSON()}, \"skin\": ${skin.toJSON()}}"
+    fun toJSON() : String {
+        return "{\"position\":{\"x\":${position.x},\"y\":${position.y}},\"skin\":{\"skin\":\"${skin.toJSON()}\"}}"
     }
 
 }

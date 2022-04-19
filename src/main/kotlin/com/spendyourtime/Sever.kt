@@ -631,6 +631,10 @@ object Server {
                             ctx.retour(404, "GUILD_MAP_NOT_EXIST")
                             return@verification
                         }
+                        if(user.player.currentGuildMap == id){
+                            ctx.retour(200, "PLAYER_IS_ALREADY_IN_MAP")
+                            return@verification
+                        }
                         user.player.currentGuildMap = id
                         ctx.retour(200, "SUCCESS_GO_TO_MAP")
                     }
@@ -639,6 +643,10 @@ object Server {
                 patch("quit"){ ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("QUIT_MAP")
+                        if(user.player.currentGuildMap == -1){
+                            ctx.retour(404, "PLAYER_IS_NOT_IN_ANY_MAP")
+                            return@verification
+                        }
                         user.player.currentGuildMap = -1
                         ctx.retour(200, "SUCCESS_QUIT_MAP")
                     }
