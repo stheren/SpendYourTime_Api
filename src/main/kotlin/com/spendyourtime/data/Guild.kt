@@ -4,6 +4,8 @@ import com.spendyourtime.helpers.Database
 
 class Guild(var name: String, var owner: User, var typeWork: Work) {
 
+    constructor() : this("", User(), Work.Work1)
+
     companion object {
         private fun getUniqueID(): Int {
             var key = 0
