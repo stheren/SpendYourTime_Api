@@ -209,7 +209,7 @@ object Server {
                         val y = ctx.formParam("posY")?.toInt() ?: -1
 
                         logger.info("PlayerPosition")
-                        if (ctx.formParam("posX").isNullOrEmpty()) {
+                        if (x == -1) {
                             ctx.retour(400, "POSX_IS_EMPTY")
                             return@verification
                         }
@@ -217,7 +217,7 @@ object Server {
                             ctx.retour(400, "POSX_IS_NOT_VALID")
                             return@verification
                         }
-                        if (ctx.formParam("posY").isNullOrEmpty()) {
+                        if (y == -1) {
                             ctx.retour(400, "POSY_IS_EMPTY")
                             return@verification
                         }
