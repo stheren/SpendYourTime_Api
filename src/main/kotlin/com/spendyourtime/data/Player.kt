@@ -14,5 +14,9 @@ class Player(var position: Position, var skin: Skin){
         return result
     }
 
+    fun toJSON() : String{
+        return "{\"position\": ${position.toJSON()}, \"skin\": ${skin.toJSON()}}"
+    }
+
 }
 

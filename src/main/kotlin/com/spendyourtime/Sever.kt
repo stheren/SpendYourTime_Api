@@ -25,9 +25,6 @@ object Server {
                 ctx.json(e.message.toString())
                 ctx.status(403)
             }
-            this.error(404) { ctx ->
-                ctx.json("Error")
-            }
         }.start(7000)
         app.routes {
 
@@ -135,7 +132,7 @@ object Server {
                             ctx.retour(404, "USER_NOT_FOUND")
                             return@verification
                         }
-                        ctx.retour(200, datauser)
+                        ctx.retour(200, datauser.toJSON())
                     }
                 }
 

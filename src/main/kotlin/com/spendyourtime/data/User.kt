@@ -42,4 +42,9 @@ data class User(var email: String, var pseudo: String, var password: String, var
         result = 31 * result + player.hashCode()
         return result
     }
+
+    // Function to return data of the user without password on JSON format
+    fun toJSON(): String{
+        return "{\"id\":$id,\"email\":\"$email\",\"pseudo\":\"$pseudo\",\"player\":${player.toJSON()}}"
+    }
 }

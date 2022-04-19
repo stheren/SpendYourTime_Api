@@ -40,4 +40,8 @@ class Skin(var body: Int, var accessories: Int, var hairstyle: Int, var eyes: In
         && other.eyes == this.eyes
         && other.outfit == this.outfit
     }
+
+    fun toJSON() : String{
+        return "{\"body\":$body,\"accessories\":$accessories,\"hairstyle\":$hairstyle,\"eyes\":$eyes,\"outfit\":$outfit}"
+    }
 }

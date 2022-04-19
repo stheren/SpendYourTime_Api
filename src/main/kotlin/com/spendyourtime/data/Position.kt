@@ -24,4 +24,9 @@ class Position(var x: Int, var y: Int){
         && other.x == this.x 
         && other.y == this.y
     }
+
+    // toJSON
+    fun toJSON() : String{
+        return "{\"x\":$x,\"y\":$y}"
+    }
 }
