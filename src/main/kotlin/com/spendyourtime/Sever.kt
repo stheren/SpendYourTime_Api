@@ -10,8 +10,23 @@ import com.spendyourtime.helpers.EmailValidator
 import com.spendyourtime.helpers.retour
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
+import io.javalin.plugin.openapi.*
+import io.javalin.plugin.openapi.annotations.*
+import io.javalin.plugin.openapi.ui.ReDocOptions
+import io.javalin.plugin.openapi.ui.SwaggerOptions
+import io.swagger.v3.oas.models.info.Info
 import org.slf4j.LoggerFactory
 import java.util.*
+
+private fun getOpenApiOptions(): OpenApiOptions {
+    val applicationInfo: Info = Info()
+        .version("1.0")
+        .description("SpendYourTime API")
+    return OpenApiOptions(applicationInfo)
+        .path("/api-docs")
+        .swagger(SwaggerOptions("/swagger").title("Swagger SpendYourTime API"))
+        .reDoc(ReDocOptions("/redoc").title("ReDoc SpendYourTime API"))
+}
 
 
 object Server {
@@ -20,42 +35,65 @@ object Server {
         val logger = LoggerFactory.getLogger(this::class.java)
         Database.loadFromJSON()
 
-        val app = Javalin.create().apply {
+        val app = Javalin.create {
+            it.registerPlugin(OpenApiPlugin(getOpenApiOptions()))
+        }.apply {
             exception(Exception::class.java) { e, ctx ->
-                ctx.json(e.message.toString())
-                ctx.status(403)
+                //ctx.json(e.message.toString())
+                ctx.status(403).json("INTERNAL_SERVER_ERROR")
             }
         }.start(7000)
         app.routes {
 
             //LOGIN
-            app.post("/login") { ctx ->
+            app.post("/login")
+            @OpenApi(
+                description = "Login a user",
+                tags = ["Users"],
+                formParams = [
+                    OpenApiFormParam(name = "pseudo", type = String::class),
+                    OpenApiFormParam(name = "password", type = String::class)
+                ],
+                responses = [
+                    OpenApiResponse("200", content = [OpenApiContent(type = "token", from = String::class)]),
+                    OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "PSEUDO_IS_EMPTY", from = String::class),
+                            OpenApiContent(type = "PASSWORD_IS_EMPTY", from = String::class),
+                            OpenApiContent(type = "PSEUDO_NOT_EXIST", from = String::class),
+                            OpenApiContent(type = "PASSWORD_NOT_VALID", from = String::class)
+                        ]
+                    ),
+                    OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class)
+                        ]
+                    )]
+            )
+            { ctx ->
                 logger.info("POST_LOGIN")
 
                 //Check pseudo login
                 if (ctx.formParam("pseudo").isNullOrEmpty()) {
                     ctx.retour(400, "PSEUDO_IS_EMPTY")
-                    return@post
-                }
-                if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) == null) {
+                    //return@post
+                } else if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) == null) {
                     ctx.retour(400, "PSEUDO_NOT_EXIST")
-                    return@post
-                }
-
-                //check Password login
-                if (ctx.formParam("password").isNullOrEmpty()) {
+                    //return@post
+                } else if (ctx.formParam("password").isNullOrEmpty()) {
                     ctx.retour(400, "PASSWORD_IS_EMPTY")
-                    return@post
-                }
-                if (!Database.allUsers.checkPassword(
-                        ctx.formParam("pseudo").toString(), ctx.formParam("password").toString()
+                    //return@post
+                } else if (!Database.allUsers.checkPassword(
+                        ctx.formParam("pseudo").toString(),
+                        ctx.formParam("password").toString()
                     )
                 ) {
                     ctx.retour(400, "PASSWORD_NOT_VALID")
-                    return@post
+                    //return@post
+                } else {
+                    val u = Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString())!!
+                    ctx.retour(200, Certification.create(u))
                 }
-                val u = Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString())!!
-                ctx.retour(200, Certification.create(u))
             }
 
             //REGISTER
@@ -108,7 +146,7 @@ object Server {
                     return@post
                 }
 
-                val u: User = User(
+                val u = User(
                     ctx.formParam("email").toString(),
                     ctx.formParam("pseudo").toString(),
                     ctx.formParam("password").toString()
@@ -207,13 +245,13 @@ object Server {
                     Certification.verification(ctx) { user ->
 
                         logger.info("PlayerPosition")
-                        val x : Int
-                        val y : Int
+                        val x: Int
+                        val y: Int
 
                         try {
                             x = ctx.formParam("posX")?.toInt() ?: -1
                             y = ctx.formParam("posY")?.toInt() ?: -1
-                        } catch (e : Exception) {
+                        } catch (e: Exception) {
                             ctx.retour(400, "POSX_OR_POSY_IS_NOT_NUMBER")
                             return@verification
                         }
@@ -609,12 +647,12 @@ object Server {
 
 
             //MAP
-            path("/Map"){
-                get("/"){ ctx ->
+            path("/Map") {
+                get("/") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GET_CURRENT_MAP_FOR_USER")
                         val current = Database.allGuilds.findGuildById(user.player.currentGuildMap)
-                        if(current == null){
+                        if (current == null) {
                             ctx.retour(404, "PLAYER_IS_NOT_IN_ANY_MAP")
                             return@verification
                         }
@@ -622,16 +660,16 @@ object Server {
                     }
                 }
 
-                patch("{id}/go"){ ctx ->
+                patch("{id}/go") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GO_TO_MAP")
                         val id = ctx.pathParam("id").toInt()
                         val guild = Database.allGuilds.findGuildById(id)
-                        if(guild == null){
+                        if (guild == null) {
                             ctx.retour(404, "GUILD_MAP_NOT_EXIST")
                             return@verification
                         }
-                        if(user.player.currentGuildMap == id){
+                        if (user.player.currentGuildMap == id) {
                             ctx.retour(200, "PLAYER_IS_ALREADY_IN_MAP")
                             return@verification
                         }
@@ -640,10 +678,10 @@ object Server {
                     }
                 }
 
-                patch("quit"){ ctx ->
+                patch("quit") { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("QUIT_MAP")
-                        if(user.player.currentGuildMap == -1){
+                        if (user.player.currentGuildMap == -1) {
                             ctx.retour(404, "PLAYER_IS_NOT_IN_ANY_MAP")
                             return@verification
                         }
@@ -653,5 +691,7 @@ object Server {
                 }
             }
         }
+        logger.info("Find redoc : http://localhost:7000/redoc")
+        logger.info("Find swagger : http://localhost:7000/swagger")
     }
 }
