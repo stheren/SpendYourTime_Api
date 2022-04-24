@@ -546,14 +546,31 @@ object Server {
                     }
                 }
 
-                get("/{id}") { ctx ->
+                get("/{id}") @OpenApi(
+                    description = "Get a guild",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "json", from = Guild::class
+                        )]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_GUILD")
                         if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
-                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            ctx.retour(404, "GUILD_NOT_FOUND")
                             //return@verification
                         } else {
                             ctx.retour(200, Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!)
@@ -561,7 +578,31 @@ object Server {
                     }
                 }
 
-                put("/{id}") { ctx ->
+
+                put("/{id}") @OpenApi(
+                    description = "Update a guild",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "SUCCESS_UPDATE_GUILD", from = String::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                            OpenApiContent(type = "GUILD_ALREADY_EXIST", from = String::class),
+                            OpenApiContent(type = "TYPE_WORK_NOT_EXIST", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) {
                         logger.info("PUT_GUILD")
                         var name = ctx.formParam("nameGuild") ?: ""
@@ -573,7 +614,7 @@ object Server {
                         }
                         val guild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                         if (guild == null) {
-                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            ctx.retour(404, "GUILD_NOT_FOUND")
                             return@verification
                         }
 
@@ -600,14 +641,35 @@ object Server {
                     }
                 }
 
-                delete("/{id}") { ctx ->
+                delete("/{id}") @OpenApi(
+                    description = "Delete guild",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "SUCCESS_DELETE_GUILD", from = String::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("DELETE_GUILD")
                         if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
-                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            ctx.retour(404, "GUILD_NOT_FOUND")
                             //return@verification
                         } else if (!Database.allGuilds.findAllGuildsByOwner(user)
                                 .contains(Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()))
@@ -620,14 +682,46 @@ object Server {
                     }
                 }
 
-                patch("/{id}/join") { ctx ->
+                patch("/{id}/join") @OpenApi(
+                    description = "Join Waiting List of guild by id",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "SUCCESS_JOIN_WAITING_LIST", from = String::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                            OpenApiContent(type = "PLAYER_ALREADY_IN_GUILD", from = String::class),
+                            OpenApiContent(type = "PLAYER_ALREADY_IN_WAITING_LIST", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ){ ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerJoinGuild")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_EMPTY")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
-                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            ctx.retour(404, "GUILD_NOT_FOUND")
+                            //return@verification
+                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.employees.contains(user)) {
+                            ctx.retour(400, "PLAYER_ALREADY_IN_GUILD")
+                            //return@verification
+                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.waitingList.contains(
+                                user
+                            )
+                        ) {
+                            ctx.retour(400, "PLAYER_ALREADY_IN_WAITING_LIST")
                             //return@verification
                         } else {
                             Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.AddMember(user)
@@ -636,49 +730,113 @@ object Server {
                     }
                 }
 
-                patch("/{id}/leave") { ctx ->
+                patch("/{id}/leave") @OpenApi(
+                    description = "Leave employees of guild by id",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "SUCCESS_LEAVE_GUILD", from = String::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                            OpenApiContent(type = "PLAYER_NOT_IN_GUILD_OR_IS_OWNER", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ){ ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerLeaveGuild")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_EMPTY")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             return@verification
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
-                            ctx.retour(400, "GUILD_NOT_FOUND")
+                            ctx.retour(404, "GUILD_NOT_FOUND")
                             return@verification
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 ?.RemoveMember(user) != true
                         ) {
                             ctx.retour(400, "PLAYER_NOT_IN_GUILD_OR_IS_OWNER")
                         } else {
-                            //manque la fonction non ?????
-                            ctx.retour(200, "SUCCESS_LEAVE_WAITING_LIST")
+                            ctx.retour(200, "SUCCESS_LEAVE_GUILD")
                         }
                     }
                 }
 
-                get("/{id}/owner") { ctx ->
+                get("/{id}/owner") @OpenApi(
+                    description = "Get owner of guild by id",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "json", from = User::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ){ ctx ->
                     Certification.verification(ctx) {
                         logger.info("OwnerGuild")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_EMPTY")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
+                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                            ctx.retour(404, "GUILD_NOT_FOUND")
                         } else {
-                            Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
-                                ?.let { ctx.retour(200, it.owner) }
+                            Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.let { ctx.retour(200, it.owner) }
                         }
                     }
                 }
 
-                get("/{id}/members") { ctx ->
+                get("/{id}/members") @OpenApi(
+                    description = "Get list of guild member by id",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "json", from = Array<User>::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ){ ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_MEMBERS")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_REQUIRED")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else {
                             val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                             if (dataguild == null) {
-                                ctx.retour(404, "GUILD_NOT_EXIST")
+                                ctx.retour(404, "GUIlD_NOT_FOUND")
                                 //return@verification
                             } else {
                                 ctx.retour(200, dataguild.employees)
@@ -687,11 +845,35 @@ object Server {
                     }
                 }
 
-                get("/{id}/waiting") { ctx ->
+
+                get("/{id}/waiting") @OpenApi(
+                    description = "Get list of guild member waiting for validation by id",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "waiting list", from = Array<User>::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class),
+                            OpenApiContent(type = "PLAYER_NOT_OWNER_GUILD", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GET_WAITING_LIST")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_REQUIRED")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else {
                             val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
@@ -708,24 +890,52 @@ object Server {
                     }
                 }
 
-                patch("/{id}/accept/{playerId}") { ctx ->
+                patch("/{id}/accept/{playerId}") @OpenApi(
+                    description = "Accept a player in guild by id",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(
+                            type = "SUCCESS_ACCEPT_MEMBER", from = String::class
+                        )]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                            OpenApiContent(type = "ID_PLAYER_REQUIRED", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class),
+                            OpenApiContent(type = "PLAYER_NOT_OWNER_GUILD", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "404", content = [
+                            OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class),
+                            OpenApiContent(type = "PLAYER_NOT_FOUND", from = String::class),
+                            OpenApiContent(type = "PLAYER_NOT_WAITING_LIST", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("ACCEPT_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_REQUIRED")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else if (ctx.pathParam("playerId").isEmpty()) {
-                            ctx.retour(400, "PLAYER_REQUIRED")
+                            ctx.retour(400, "ID_PLAYER_REQUIRED")
                             //return@verification
                         } else {
                             val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
                             if (datauser == null) {
-                                ctx.retour(400, "PLAYER_NOT_FOUND")
+                                ctx.retour(404, "PLAYER_NOT_FOUND")
                                 //return@verification
                             } else {
                                 val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 if (dataguild == null) {
-                                    ctx.retour(404, "GUILD_NOT_EXIST")
+                                    ctx.retour(404, "GUILD_NOT_FOUND")
                                     //return@verification
                                 } else if (dataguild.owner != user) {
                                     ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
@@ -743,14 +953,43 @@ object Server {
                     }
                 }
 
-                patch("/{id}/decline/{playerId}") { ctx ->
+                patch("/{id}/decline/{playerId}") @OpenApi(
+                    description = "Decline a player in a guild",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [
+                        OpenApiResponse(
+                            "200", content = [
+                                OpenApiContent(type = "SUCCESS_REFUSE_MEMBER", from = String::class)
+                            ]
+                        ), OpenApiResponse(
+                            "400", content = [
+                                OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                                OpenApiContent(type = "ID_PLAYER_REQUIRED", from = String::class)
+                            ]
+                        ), OpenApiResponse(
+                            "403", content = [
+                                OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                                OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class),
+                                OpenApiContent(type = "PLAYER_NOT_OWNER_GUILD", from = String::class)
+                            ]
+                        ), OpenApiResponse(
+                            "404", content = [
+                                OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class),
+                                OpenApiContent(type = "PLAYER_NOT_FOUND", from = String::class),
+                                OpenApiContent(type = "PLAYER_NOT_WAITING_LIST", from = String::class),
+                            ]
+                        ), OpenApiResponse(
+                            "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                        )]
+                ){ ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("REFUSE_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_REQUIRED")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else if (ctx.pathParam("playerId").isEmpty()) {
-                            ctx.retour(400, "PLAYER_REQUIRED")
+                            ctx.retour(400, "ID_PLAYER_REQUIRED")
                             //return@verification
                         } else {
                             val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
@@ -760,7 +999,7 @@ object Server {
                             } else {
                                 val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 if (dataguild == null) {
-                                    ctx.retour(404, "GUILD_NOT_EXIST")
+                                    ctx.retour(404, "GUI_NOT_FOUND")
                                     //return@verification
                                 } else if (dataguild.owner != user) {
                                     ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")
@@ -777,24 +1016,53 @@ object Server {
                     }
                 }
 
-                patch("/{id}/kick/{playerId}") { ctx ->
+                patch("/{id}/kick/{playerId}") @OpenApi(
+                    description = "Kick a player from the guild",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [
+                        OpenApiResponse(
+                            "200", content = [
+                                OpenApiContent(type = "SUCCESS_KICK_MEMBER", from = String::class)
+                            ]
+                        ), OpenApiResponse(
+                            "400", content = [
+                                OpenApiContent(type = "ID_GUILD_REQUIRED", from = String::class),
+                                OpenApiContent(type = "ID_PLAYER_REQUIRED", from = String::class)
+                            ]
+                        ), OpenApiResponse(
+                            "403", content = [
+                                OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                                OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class),
+                                OpenApiContent(type = "PLAYER_NOT_OWNER_GUILD", from = String::class)
+                            ]
+                        ), OpenApiResponse(
+                            "404", content = [
+                                OpenApiContent(type = "GUILD_NOT_FOUND", from = String::class),
+                                OpenApiContent(type = "PLAYER_NOT_FOUND", from = String::class),
+                                OpenApiContent(type = "PLAYER_NOT_MEMBER_GUILD", from = String::class),
+                            ]
+                        ), OpenApiResponse(
+                            "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                        )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("KICK_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
-                            ctx.retour(400, "GUILD_REQUIRED")
+                            ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else if (ctx.pathParam("playerId").isEmpty()) {
-                            ctx.retour(400, "PLAYER_REQUIRED")
+                            ctx.retour(400, "ID_PLAYER_REQUIRED")
                             //return@verification
                         } else {
                             val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
                             if (datauser == null) {
-                                ctx.retour(400, "PLAYER_NOT_FOUND")
+                                ctx.retour(404, "PLAYER_NOT_FOUND")
                                 //return@verification
                             } else {
                                 val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 if (dataguild == null) {
-                                    ctx.retour(404, "GUILD_NOT_EXIST")
+                                    ctx.retour(404, "GUI_NOT_FOUND")
                                     //return@verification
                                 } else if (dataguild.owner != user) {
                                     ctx.retour(403, "PLAYER_NOT_OWNER_GUILD")

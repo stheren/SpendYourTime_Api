@@ -23,7 +23,7 @@ object Certification {
         return jwt.encode()
     }
 
-    fun find(token : String, p : (User?) -> Unit) {
+    fun find(ctx : Context, token : String, p : (User?) -> Unit) {
         val e = JWT.decode(token).tap {
             it.claimValue("email").tap { email ->
                     p(Database.allUsers.findUserByEmail(email))
@@ -31,12 +31,13 @@ object Certification {
         }
         e.handleError {
             logger.info("UNDECODED_JWT_TOKEN")
-            throw Exception("UNDECODED_JWT_TOKEN")
+            ctx.json("DECODED_BUT_UNKNOW_PLAYER")
+            ctx.status(403)
         }
     }
 
     fun verification(ctx : Context, p : (User) -> Unit){
-        find(ctx.header("token").toString()) { user ->
+        find(ctx, ctx.header("token").toString()) { user ->
             if (user == null) {
                 logger.info("DECODED_BUT_UNKNOW_PLAYER")
                 ctx.json("DECODED_BUT_UNKNOW_PLAYER")
