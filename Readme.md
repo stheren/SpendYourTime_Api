@@ -23,7 +23,7 @@
 
 ```bash
 docker build --tag spendyourtime_api:latest .
-docker container run -d -p 7000:7000 spendyourtime_api:latest
+docker container run -p 7000:7000 spendyourtime_api:latest
 ```
 
 You can find swagger at :
