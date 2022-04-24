@@ -34,7 +34,7 @@ object Server {
         }.apply {
             exception(Exception::class.java) { e, ctx ->
                 //ctx.json(e.message.toString())
-                ctx.status(403).json("INTERNAL_SERVER_ERROR")
+                ctx.status(500).json("SERVER_ERROR")
             }
         }.start(7000)
         app.routes {
@@ -55,7 +55,7 @@ object Server {
                         type = "PSEUDO_NOT_EXIST", from = String::class
                     ), OpenApiContent(type = "PASSWORD_NOT_VALID", from = String::class)]
                 ), OpenApiResponse(
-                    "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class)]
+                    "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                 )]
             ) { ctx ->
                 logger.info("POST_LOGIN")
@@ -113,7 +113,7 @@ object Server {
                         type = "PASSWORD_TOO_SHORT", from = String::class
                     )]
                 ), OpenApiResponse(
-                    "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class)]
+                    "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                 )]
             ) { ctx ->
                 logger.info("USER_REGISTER")
@@ -170,12 +170,17 @@ object Server {
             //USER ROUTES
             path("User") {
                 get("/") @OpenApi(
-                    description = "Get user logged informations", tags = ["User"], responses = [OpenApiResponse(
+                    description = "Get user logged informations",
+                    tags = ["User"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "json", from = User::class)]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
@@ -187,11 +192,13 @@ object Server {
                     description = "Get id user informations", tags = ["User"], responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "json", from = User::class)]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
                     ), OpenApiResponse(
                         "404", content = [OpenApiContent(type = "USER_NOT_FOUND", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) {
@@ -264,9 +271,11 @@ object Server {
                     description = "Delete user", tags = ["User"], responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "USER_DELETED", from = String::class)]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
@@ -291,9 +300,11 @@ object Server {
                             OpenApiContent(type = "POSX_IS_NOT_VALID", from = String::class),
                         ]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
@@ -328,9 +339,11 @@ object Server {
                     description = "Get player skin", tags = ["Player"], responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "PLAYER_SKIN_FOUND", from = String::class)]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     logger.info("GET_SKIN")
@@ -348,9 +361,11 @@ object Server {
                             type = "SKIN_IS_NOT_VALID", from = String::class
                         ), OpenApiContent(type = "SKIN_IS_NOT_FOUND", from = String::class)]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     logger.info("CHANGE_SKIN_PLAYER")
@@ -371,9 +386,11 @@ object Server {
                             type = "json", from = Array<Guild>::class
                         ), OpenApiContent(type = "NO_GUILD", from = String::class)]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
@@ -392,9 +409,11 @@ object Server {
                             type = "json", from = Array<Guild>::class
                         ), OpenApiContent(type = "NO_OWNED_GUILD", from = String::class)]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
@@ -417,9 +436,11 @@ object Server {
                             type = "json", from = Array<Guild>::class
                         )]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) {
@@ -434,7 +455,7 @@ object Server {
                             type = "SUCCESS_CREATE_GUILD", from = String::class
                         )]
                     ), OpenApiResponse(
-                        "403", content = [OpenApiContent(type = "INTERNAL_SERVER_ERROR", from = String::class),
+                        "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
                             OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
                     ), OpenApiResponse(
@@ -445,6 +466,8 @@ object Server {
                             type = "TYPE_WORK_NOT_EXIST",
                             from = String::class
                         ), OpenApiContent(type = "NAME_GUILD_ALREADY_EXIST", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
