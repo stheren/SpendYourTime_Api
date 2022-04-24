@@ -19,39 +19,8 @@
 
 ![](https://img.shields.io/badge/com.github.johnrengelman.shadow-5.2.0-black)
 
-## Routes
-![GET]
-![POST]
-![PUT]
-![PATCH]
-![DELETE]
+# How to use it
 
-TYPE | PATH | ROUTE | DESCRIPTION | PARAMETERS | RESPONSE
---- | --- | --- | --- | --- | ---
-![POST]| | `/login` | log user on API | `Form-data : {pseudo, password}` | `{token}`
-![POST]| | `/register` | register user | `Form-data : {email, pseudo, password}` | `{token}`
-![GET] | `/User` | `/` | return user data | `header : {token}`  | `{pseudo, email, player}`
-![GET] | `/User` | `/:id` | return user data | `header : {token}`  | `{pseudo, email, player}`
-![PUT] | `/User` | `/` | update user data | `header : {token}` `form-data : {pseudo, email, password}`  | `SUCCESS MESSAGE`
-![DELETE] | `/User` | `/` | delete user | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Player`| `/skin` | return skin data | `header : {token}`  | `{skin}`
-![PUT] | `/Player` | `/skin` | update skin data | `header : {token}` `form-data : {body, eyes, accessories, hairstyle, outfit}`  | `SUCCESS MESSAGE`
-![PUT] | `/Player` | `/position` | update position data | `header : {token}` `form-data : {posX, posY}`  | `SUCCESS MESSAGE`
-![GET] | `/Player` | `/guilds` | return guilds data | `header : {token}`  | `{array of guilds}`
-![GET] | `/Player` | `/owns` | return own guilds data | `header : {token}`  | `{array of guilds}`
-![GET] | `/Guild` | `/` | return all guilds data | `header : {token}`  | `Array of {guild}`
-![POST] | `/Guild` | `/` | create guild | `header : {token}` `form-data : {name, typeOfWork}`  | `SUCCESS MESSAGE`
-![GET] | `/Guild` | `/:id` | return guild data | `header : {token}`  | `{guild}`
-![PUT] | `/Guild` | `/:id` | update guild data | `header : {token}` `form-data : {name, typeOfWork}`  | `SUCCESS MESSAGE`
-![DELETE] | `/Guild` | `/:id` | delete guild | `header : {token}`  | `SUCCESS MESSAGE`
-![PATCH] | `/Guild` | `/:id/join` | join waiting list of guild | `header : {token}`  | `SUCCESS MESSAGE`
-![PATCH] | `/Guild` | `/:id/leave` | leave guild | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Guild` | `/:id/owner` | return owner of guild | `header : {token}`  | `{User}`
-![GET] | `/Guild` | `/:id/members` | return members of guild | `header : {token}`  | `{Array of User}`
-![GET] | `/Guild` | `/:id/waiting` | return waiting members of guild | `header : {token}`  | `{Array of User}`
-![PATCH] | `/Guild` | `/:id/accept/:player` | accept member of guild | `header : {token}`  | `SUCCESS MESSAGE`
-![PATCH] | `/Guild` | `/:id/decline/:player` | decline member of guild | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Guild` | `/:id/kick/:player` | kick member of guild | `header : {token}`  | `SUCCESS MESSAGE`
-![GET] | `/Chat` | `/` | List last message from 5 minutes | `header : {token}` | `{Array of User}`
-![POST] | `/Chat` | `/create` | add message to chat | `header : token` | `SUCCESS MESSAGE`
-![GET] | `/Map` | `/` | return map | `nothing` | `matrix[3][X][Y]`
+```bash
+
+```
