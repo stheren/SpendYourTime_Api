@@ -175,7 +175,7 @@ object Server {
                     tags = ["User"],
                     headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
-                        "200", content = [OpenApiContent(type = "json", from = User::class)]
+                        "200", content = [OpenApiContent(type = "application/json", from = User::class)]
                     ), OpenApiResponse(
                         "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
@@ -195,7 +195,7 @@ object Server {
                     headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     pathParams = [OpenApiParam(name = "id", type = Int::class)],
                     responses = [OpenApiResponse(
-                        "200", content = [OpenApiContent(type = "json", from = User::class)]
+                        "200", content = [OpenApiContent(type = "application/json", from = User::class)]
                     ), OpenApiResponse(
                         "403", content = [
                             OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
@@ -410,7 +410,7 @@ object Server {
                         OpenApiFormParam(name = "outfit", type = Int::class)
                     ],
                     responses = [OpenApiResponse(
-                        "200", content = [OpenApiContent(type = "json", from = Skin::class)]
+                        "200", content = [OpenApiContent(type = "application/json", from = Skin::class)]
                     ), OpenApiResponse(
                         "400", content = [OpenApiContent(
                             type = "SKIN_IS_NOT_VALID", from = String::class
@@ -441,7 +441,7 @@ object Server {
                     headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
-                            type = "json", from = Array<Guild>::class
+                            type = "application/json", from = Array<Guild>::class
                         ), OpenApiContent(type = "NO_GUILD", from = String::class)]
                     ), OpenApiResponse(
                         "403", content = [
@@ -467,7 +467,7 @@ object Server {
                     headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
-                            type = "json", from = Array<Guild>::class
+                            type = "application/json", from = Array<Guild>::class
                         ), OpenApiContent(type = "NO_OWNED_GUILD", from = String::class)]
                     ), OpenApiResponse(
                         "403", content = [
@@ -497,7 +497,7 @@ object Server {
                     headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
-                            type = "json", from = Array<Guild>::class
+                            type = "application/json", from = Array<Guild>::class
                         )]
                     ), OpenApiResponse(
                         "403", content = [
@@ -575,7 +575,7 @@ object Server {
                     pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
-                            type = "json", from = Guild::class
+                            type = "application/json", from = Guild::class
                         )]
                     ), OpenApiResponse(
                         "403", content = [
@@ -812,7 +812,7 @@ object Server {
                     pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
-                            type = "json", from = User::class
+                            type = "application/json", from = User::class
                         )]
                     ), OpenApiResponse(
                         "400", content = [
@@ -849,7 +849,7 @@ object Server {
                     pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
-                            type = "json", from = Array<User>::class
+                            type = "application/json", from = Array<User>::class
                         )]
                     ), OpenApiResponse(
                         "400", content = [
