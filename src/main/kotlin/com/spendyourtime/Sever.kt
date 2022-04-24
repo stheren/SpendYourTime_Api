@@ -189,7 +189,10 @@ object Server {
                 }
 
                 get("/{id}") @OpenApi(
-                    description = "Get id user informations", tags = ["User"], responses = [OpenApiResponse(
+                    description = "Get id user informations",
+                    tags = ["User"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "json", from = User::class)]
                     ), OpenApiResponse(
                         "403", content = [
@@ -213,7 +216,29 @@ object Server {
                 }
 
                 //modify user pseudo, email or password
-                put("/") { ctx ->
+                put("/") @OpenApi(
+                    description = "Get id user informations",
+                    tags = ["User"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(type = "token", from = String::class)]
+                    ), OpenApiResponse(
+                        "400", content = [
+                            OpenApiContent(type = "PSEUDO_TOO_SHORT", from = String::class),
+                            OpenApiContent(type = "PSEUDO_TOO_LONG", from = String::class),
+                            OpenApiContent(type = "PSEUDO_ALREADY_EXIST", from = String::class),
+                            OpenApiContent(type = "EMAIL_INVALID", from = String::class),
+                            OpenApiContent(type = "EMAIL_ALREADY_EXIST", from = String::class),
+                            OpenApiContent(type = "PASSWORD_TOO_SHORT", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         var email = ctx.formParam("email").toString()
                         var pseudo = ctx.formParam("pseudo").toString()
@@ -268,7 +293,10 @@ object Server {
                 }
 
                 delete("/") @OpenApi(
-                    description = "Delete user", tags = ["User"], responses = [OpenApiResponse(
+                    description = "Delete user",
+                    tags = ["User"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "USER_DELETED", from = String::class)]
                     ), OpenApiResponse(
                         "403", content = [
@@ -290,7 +318,10 @@ object Server {
             //Player
             path("/Player") {
                 put("/position") @OpenApi(
-                    description = "Update player position", tags = ["Player"], responses = [OpenApiResponse(
+                    description = "Update player position",
+                    tags = ["Player"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "PLAYER_POSITION_UPDATED", from = String::class)]
                     ), OpenApiResponse(
                         "400",
@@ -336,7 +367,10 @@ object Server {
                 }
 
                 get("/skin") @OpenApi(
-                    description = "Get player skin", tags = ["Player"], responses = [OpenApiResponse(
+                    description = "Get player skin",
+                    tags = ["Player"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "PLAYER_SKIN_FOUND", from = String::class)]
                     ), OpenApiResponse(
                         "403", content = [
@@ -354,7 +388,10 @@ object Server {
                 }
 
                 put("/skin") @OpenApi(
-                    description = "Change player skin", tags = ["Player"], responses = [OpenApiResponse(
+                    description = "Change player skin",
+                    tags = ["Player"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "json", from = Skin::class)]
                     ), OpenApiResponse(
                         "400", content = [OpenApiContent(
@@ -381,7 +418,10 @@ object Server {
                 }
 
                 get("/guilds") @OpenApi(
-                    description = "Get all Guild of the player", tags = ["Player"], responses = [OpenApiResponse(
+                    description = "Get all Guild of the player",
+                    tags = ["Player"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Array<Guild>::class
                         ), OpenApiContent(type = "NO_GUILD", from = String::class)]
@@ -404,7 +444,10 @@ object Server {
                 }
 
                 get("/owns") @OpenApi(
-                    description = "Get all owned guilds of the player", tags = ["Player"], responses = [OpenApiResponse(
+                    description = "Get all owned guilds of the player",
+                    tags = ["Player"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Array<Guild>::class
                         ), OpenApiContent(type = "NO_OWNED_GUILD", from = String::class)]
@@ -431,7 +474,10 @@ object Server {
             //Guilde
             path("Guild") {
                 get("/") @OpenApi(
-                    description = "Get all guilds", tags = ["Guild"], responses = [OpenApiResponse(
+                    description = "Get all guilds",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Array<Guild>::class
                         )]
@@ -450,7 +496,10 @@ object Server {
                 }
 
                 post("/") @OpenApi(
-                    description = "Create a guild", tags = ["Guild"], responses = [OpenApiResponse(
+                    description = "Create a guild",
+                    tags = ["Guild"],
+                    headers = [OpenApiParam(name = "token")],
+                    responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "SUCCESS_CREATE_GUILD", from = String::class
                         )]
