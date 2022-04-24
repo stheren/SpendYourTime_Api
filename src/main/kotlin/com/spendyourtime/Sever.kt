@@ -35,6 +35,7 @@ object Server {
         }.apply {
             exception(Exception::class.java) { e, ctx ->
                 //ctx.json(e.message.toString())
+                logger.error("Exception: ", e)
                 ctx.status(500).json("SERVER_ERROR")
             }
         }.start(7000)
