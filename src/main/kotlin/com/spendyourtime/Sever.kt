@@ -1,6 +1,7 @@
 package com.spendyourtime
 
 import com.spendyourtime.data.*
+import com.spendyourtime.data.Map
 import com.spendyourtime.helpers.Certification
 import com.spendyourtime.helpers.Database
 import com.spendyourtime.helpers.EmailValidator
@@ -172,7 +173,7 @@ object Server {
                 get("/") @OpenApi(
                     description = "Get user logged informations",
                     tags = ["User"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "json", from = User::class)]
                     ), OpenApiResponse(
@@ -191,7 +192,8 @@ object Server {
                 get("/{id}") @OpenApi(
                     description = "Get id user informations",
                     tags = ["User"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = Int::class)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "json", from = User::class)]
                     ), OpenApiResponse(
@@ -219,7 +221,12 @@ object Server {
                 put("/") @OpenApi(
                     description = "Get id user informations",
                     tags = ["User"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    formParams = [
+                        OpenApiFormParam(name = "email", type = String::class, required = false),
+                        OpenApiFormParam(name = "pseudo", type = String::class, required = false),
+                        OpenApiFormParam(name = "password", type = String::class, required = false)
+                    ],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "token", from = String::class)]
                     ), OpenApiResponse(
@@ -295,7 +302,7 @@ object Server {
                 delete("/") @OpenApi(
                     description = "Delete user",
                     tags = ["User"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "USER_DELETED", from = String::class)]
                     ), OpenApiResponse(
@@ -320,7 +327,11 @@ object Server {
                 put("/position") @OpenApi(
                     description = "Update player position",
                     tags = ["Player"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    formParams = [
+                        OpenApiFormParam(name = "x", type = Int::class),
+                        OpenApiFormParam(name = "y", type = Int::class)
+                    ],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "PLAYER_POSITION_UPDATED", from = String::class)]
                     ), OpenApiResponse(
@@ -369,7 +380,7 @@ object Server {
                 get("/skin") @OpenApi(
                     description = "Get player skin",
                     tags = ["Player"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "PLAYER_SKIN_FOUND", from = String::class)]
                     ), OpenApiResponse(
@@ -390,7 +401,14 @@ object Server {
                 put("/skin") @OpenApi(
                     description = "Change player skin",
                     tags = ["Player"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    formParams = [
+                        OpenApiFormParam(name = "body", type = Int::class),
+                        OpenApiFormParam(name = "eyes", type = Int::class),
+                        OpenApiFormParam(name = "accessories", type = Int::class),
+                        OpenApiFormParam(name = "hairstyle", type = Int::class),
+                        OpenApiFormParam(name = "outfit", type = Int::class)
+                    ],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "json", from = Skin::class)]
                     ), OpenApiResponse(
@@ -420,7 +438,7 @@ object Server {
                 get("/guilds") @OpenApi(
                     description = "Get all Guild of the player",
                     tags = ["Player"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Array<Guild>::class
@@ -446,7 +464,7 @@ object Server {
                 get("/owns") @OpenApi(
                     description = "Get all owned guilds of the player",
                     tags = ["Player"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Array<Guild>::class
@@ -476,7 +494,7 @@ object Server {
                 get("/") @OpenApi(
                     description = "Get all guilds",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Array<Guild>::class
@@ -498,7 +516,11 @@ object Server {
                 post("/") @OpenApi(
                     description = "Create a guild",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    formParams = [
+                        OpenApiFormParam(name = "name", type = String::class),
+                        OpenApiFormParam(name = "typeOfWork", type = Work::class),
+                    ],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "SUCCESS_CREATE_GUILD", from = String::class
@@ -549,7 +571,8 @@ object Server {
                 get("/{id}") @OpenApi(
                     description = "Get a guild",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Guild::class
@@ -582,7 +605,12 @@ object Server {
                 put("/{id}") @OpenApi(
                     description = "Update a guild",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
+                    formParams = [
+                        OpenApiFormParam(name = "name", type = String::class),
+                        OpenApiFormParam(name = "typeOfWork", type = Work::class),
+                    ],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "SUCCESS_UPDATE_GUILD", from = String::class
@@ -644,7 +672,8 @@ object Server {
                 delete("/{id}") @OpenApi(
                     description = "Delete guild",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "SUCCESS_DELETE_GUILD", from = String::class
@@ -685,7 +714,8 @@ object Server {
                 patch("/{id}/join") @OpenApi(
                     description = "Join Waiting List of guild by id",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "SUCCESS_JOIN_WAITING_LIST", from = String::class
@@ -705,7 +735,7 @@ object Server {
                     ), OpenApiResponse(
                         "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
-                ){ ctx ->
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerJoinGuild")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -714,7 +744,10 @@ object Server {
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.employees.contains(user)) {
+                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.employees.contains(
+                                user
+                            )
+                        ) {
                             ctx.retour(400, "PLAYER_ALREADY_IN_GUILD")
                             //return@verification
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.waitingList.contains(
@@ -733,7 +766,8 @@ object Server {
                 patch("/{id}/leave") @OpenApi(
                     description = "Leave employees of guild by id",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "SUCCESS_LEAVE_GUILD", from = String::class
@@ -752,7 +786,7 @@ object Server {
                     ), OpenApiResponse(
                         "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
-                ){ ctx ->
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("PlayerLeaveGuild")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -774,7 +808,8 @@ object Server {
                 get("/{id}/owner") @OpenApi(
                     description = "Get owner of guild by id",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = User::class
@@ -792,7 +827,7 @@ object Server {
                     ), OpenApiResponse(
                         "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
-                ){ ctx ->
+                ) { ctx ->
                     Certification.verification(ctx) {
                         logger.info("OwnerGuild")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -801,7 +836,8 @@ object Server {
                         } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                         } else {
-                            Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.let { ctx.retour(200, it.owner) }
+                            Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                                ?.let { ctx.retour(200, it.owner) }
                         }
                     }
                 }
@@ -809,7 +845,8 @@ object Server {
                 get("/{id}/members") @OpenApi(
                     description = "Get list of guild member by id",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "json", from = Array<User>::class
@@ -827,7 +864,7 @@ object Server {
                     ), OpenApiResponse(
                         "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                     )]
-                ){ ctx ->
+                ) { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_MEMBERS")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -849,7 +886,8 @@ object Server {
                 get("/{id}/waiting") @OpenApi(
                     description = "Get list of guild member waiting for validation by id",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "waiting list", from = Array<User>::class
@@ -893,7 +931,12 @@ object Server {
                 patch("/{id}/accept/{playerId}") @OpenApi(
                     description = "Accept a player in guild by id",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(
+                        name = "id",
+                        type = String::class,
+                        required = true
+                    ), OpenApiParam(name = "playerId", type = String::class, required = true)],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(
                             type = "SUCCESS_ACCEPT_MEMBER", from = String::class
@@ -956,7 +999,12 @@ object Server {
                 patch("/{id}/decline/{playerId}") @OpenApi(
                     description = "Decline a player in a guild",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(
+                        name = "id",
+                        type = String::class,
+                        required = true
+                    ), OpenApiParam(name = "playerId", type = String::class, required = true)],
                     responses = [
                         OpenApiResponse(
                             "200", content = [
@@ -982,7 +1030,7 @@ object Server {
                         ), OpenApiResponse(
                             "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
                         )]
-                ){ ctx ->
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("REFUSE_MEMBER")
                         if (ctx.pathParam("id").isEmpty()) {
@@ -1019,7 +1067,12 @@ object Server {
                 patch("/{id}/kick/{playerId}") @OpenApi(
                     description = "Kick a player from the guild",
                     tags = ["Guild"],
-                    headers = [OpenApiParam(name = "token")],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(
+                        name = "id",
+                        type = String::class,
+                        required = true
+                    ), OpenApiParam(name = "playerId", type = String::class, required = true)],
                     responses = [
                         OpenApiResponse(
                             "200", content = [
@@ -1082,14 +1135,45 @@ object Server {
 
             //Chat
             path("/Chat") {
-                get("/") { ctx -> //List last message from 5 minutes
+                get("/") @OpenApi(
+                    description = "Get all chat since 5 minutes",
+                    tags = ["Chat"],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(type = "application/json", from = Array<Message>::class)]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx -> //List last message from 5 minutes
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_CHAT")
                         ctx.retour(200, Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time))
                     }
                 }
 
-                post("/create") { ctx ->
+                post("/create") @OpenApi(
+                    description = "Create a new message",
+                    tags = ["Chat"],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    formParams = [
+                        OpenApiFormParam(name = "message", type = String::class)
+                    ],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(type = "SUCCESS_CREATE_MESSAGE_CHAT", from = String::class)]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("CREATE_MESSAGE_CHAT")
                         val message = ctx.formParam("message")
@@ -1103,7 +1187,21 @@ object Server {
                     }
                 }
 
-                get("/all") { ctx ->
+                get("/all") @OpenApi(
+                    description = "Get all chat",
+                    tags = ["Chat"],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(type = "application/json", from = Array<Message>::class)]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_CHAT")
                         ctx.retour(200, Database.allChat)
@@ -1114,7 +1212,23 @@ object Server {
 
             //MAP
             path("/Map") {
-                get("/") { ctx ->
+                get("/") @OpenApi(
+                    description = "Get Current map for user",
+                    tags = ["Map"],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    responses = [OpenApiResponse(
+                        "200", content = [OpenApiContent(type = "application/json", from = Map::class)]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "PLAYER_IS_NOT_IN_ANY_MAP", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GET_CURRENT_MAP_FOR_USER")
                         val current = Database.allGuilds.findGuildById(user.player.currentGuildMap)
@@ -1127,7 +1241,27 @@ object Server {
                     }
                 }
 
-                patch("{id}/go") { ctx ->
+                patch("{id}/go") @OpenApi(
+                    description = "Go to map",
+                    tags = ["Map"],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    pathParams = [OpenApiParam(name = "id", type = Int::class, required = true)],
+                    responses = [OpenApiResponse(
+                        "200", content = [
+                            OpenApiContent(type = "SUCCESS_GO_TO_MAP", from = String::class),
+                            OpenApiContent(type = "PLAYER_IS_ALREADY_IN_MAP", from = String::class),
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "GUILD_MAP_NOT_EXIST", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GO_TO_MAP")
                         val id = ctx.pathParam("id").toInt()
@@ -1145,7 +1279,25 @@ object Server {
                     }
                 }
 
-                patch("quit") { ctx ->
+                patch("quit") @OpenApi(
+                    description = "Quit map",
+                    tags = ["Map"],
+                    headers = [OpenApiParam(name = "token", type = String::class, required = true)],
+                    responses = [OpenApiResponse(
+                        "200", content = [
+                            OpenApiContent(type = "SUCCESS_QUIT_MAP", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "403", content = [
+                            OpenApiContent(type = "DECODED_BUT_UNKNOW_PLAYER", from = String::class),
+                            OpenApiContent(type = "UNDECODED_JWT_TOKEN", from = String::class)
+                        ]
+                    ), OpenApiResponse(
+                        "404", content = [OpenApiContent(type = "PLAYER_IS_NOT_IN_ANY_MAP", from = String::class)]
+                    ), OpenApiResponse(
+                        "500", content = [OpenApiContent(type = "SERVER_ERROR", from = String::class)]
+                    )]
+                ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("QUIT_MAP")
                         if (user.player.currentGuildMap == -1) {
@@ -1159,6 +1311,7 @@ object Server {
                 }
             }
         }
+
         logger.info("Find redoc : http://localhost:7000/redoc")
         logger.info("Find swagger : http://localhost:7000/swagger")
     }
