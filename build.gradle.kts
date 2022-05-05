@@ -10,6 +10,7 @@ val javalinVersion: String by project
 val slf4jVersion: String by project
 val jacksonVersion: String by project
 val kjwtVersion: String by project
+val ktormVersion: String by project
 
 repositories {
     mavenCentral()
@@ -32,6 +33,7 @@ dependencies {
     implementation("io.github.nefilim.kjwt:kjwt-google-kms-grpc:$kjwtVersion")
     implementation("io.github.nefilim.kjwt:kjwt-jwks:$kjwtVersion")
 
+    implementation("org.ktorm:ktorm-core:$ktormVersion")
 }
 
 application {
