@@ -47,7 +47,7 @@ object Server {
                 description = "Login a user", tags = ["Users"], formParams = [OpenApiFormParam(
                     name = "pseudo", type = String::class
                 ), OpenApiFormParam(name = "password", type = String::class)], responses = [OpenApiResponse(
-                    "200", content = [OpenApiContent(type = "token", from = String::class)]
+                    "200", content = [OpenApiContent(type = "Token", from = Token::class)]
                 ), OpenApiResponse(
                     "400", content = [OpenApiContent(
                         type = "PSEUDO_IS_EMPTY", from = String::class
@@ -93,7 +93,7 @@ object Server {
                     name = "email",
                     type = String::class
                 )], responses = [OpenApiResponse(
-                    "200", content = [OpenApiContent(type = "token", from = String::class)]
+                    "200", content = [OpenApiContent(type = "Tokeb", from = Token::class)]
                 ), OpenApiResponse(
                     "400", content = [OpenApiContent(
                         type = "EMAIL_IS_EMPTY", from = String::class
@@ -330,8 +330,8 @@ object Server {
                     tags = ["Player"],
                     headers = [OpenApiParam(name = "token", type = String::class, required = true)],
                     formParams = [
-                        OpenApiFormParam(name = "x", type = Int::class),
-                        OpenApiFormParam(name = "y", type = Int::class)
+                        OpenApiFormParam(name = "posX", type = Int::class),
+                        OpenApiFormParam(name = "posY", type = Int::class)
                     ],
                     responses = [OpenApiResponse(
                         "200", content = [OpenApiContent(type = "PLAYER_POSITION_UPDATED", from = String::class)]

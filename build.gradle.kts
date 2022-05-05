@@ -36,6 +36,22 @@ dependencies {
     implementation("org.ktorm:ktorm-core:$ktormVersion")
 }
 
+distributions {
+    shadow.configure {
+        contents {
+            from("chat.json"){
+                into("bin")
+            }
+            from("guilds.json"){
+                into("bin")
+            }
+            from("users.json"){
+                into("bin")
+            }
+        }
+    }
+}
+
 application {
     mainClassName = "com.spendyourtime.Server"
 }

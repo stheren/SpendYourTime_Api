@@ -1,6 +1,7 @@
 package com.spendyourtime.helpers
 
 import arrow.core.handleError
+import com.spendyourtime.data.Token
 import com.spendyourtime.data.User
 import io.github.nefilim.kjwt.JWT
 import io.github.nefilim.kjwt.JWTKeyID
@@ -13,14 +14,14 @@ import java.time.ZoneId
 object Certification {
     val logger = LoggerFactory.getLogger(this::class.java)
 
-    fun create(u : User) : String{
+    fun create(u : User) : Token{
         val jwt = JWT.es256(JWTKeyID("kid-123")) {
             subject("Token ID")
             claim("email", u.email)
             issuedAt(LocalDateTime.ofInstant(Instant.ofEpochSecond(1516239022), ZoneId.of("UTC")))
         }
         logger.info("Token is create for ${u.pseudo}")
-        return jwt.encode()
+        return Token(jwt.encode())
     }
 
     fun find(ctx : Context, token : String, p : (User?) -> Unit) {
