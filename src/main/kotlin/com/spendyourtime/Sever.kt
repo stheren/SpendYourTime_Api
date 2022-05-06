@@ -2,10 +2,7 @@ package com.spendyourtime
 
 import com.spendyourtime.data.*
 import com.spendyourtime.data.Map
-import com.spendyourtime.helpers.Certification
-import com.spendyourtime.helpers.Database
-import com.spendyourtime.helpers.EmailValidator
-import com.spendyourtime.helpers.retour
+import com.spendyourtime.helpers.*
 import io.javalin.Javalin
 import io.javalin.apibuilder.ApiBuilder.*
 import io.javalin.plugin.openapi.*
@@ -28,7 +25,7 @@ object Server {
     @JvmStatic
     fun main(args: Array<String>) {
         val logger = LoggerFactory.getLogger(this::class.java)
-        Database.loadFromJSON()
+        Jsonbase.loadFromJSON()
 
         val app = Javalin.create {
             it.registerPlugin(OpenApiPlugin(getOpenApiOptions()))
@@ -40,6 +37,10 @@ object Server {
             }
         }.start(7000)
         app.routes {
+
+            app.get("info") { ctx ->
+                DatabaseConnect.AllUsers.getAllUsers()?.let { ctx.retour(200, it) }
+            }
 
             //LOGIN
             app.post("/login")
@@ -66,20 +67,20 @@ object Server {
                 if (ctx.formParam("pseudo").isNullOrEmpty()) {
                     ctx.retour(400, "PSEUDO_IS_EMPTY")
                     //return@post
-                } else if (Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) == null) {
+                } else if (DatabaseConnect.AllUsers.findUserByPseudo(ctx.formParam("pseudo").toString()) == null) {
                     ctx.retour(400, "PSEUDO_NOT_EXIST")
                     //return@post
                 } else if (ctx.formParam("password").isNullOrEmpty()) {
                     ctx.retour(400, "PASSWORD_IS_EMPTY")
                     //return@post
-                } else if (!Database.allUsers.checkPassword(
+                } else if (!DatabaseConnect.AllUsers.checkPassword(
                         ctx.formParam("pseudo").toString(), ctx.formParam("password").toString()
                     )
                 ) {
                     ctx.retour(400, "PASSWORD_NOT_VALID")
                     //return@post
                 } else {
-                    val u = Database.allUsers.findUserByPseudo(ctx.formParam("pseudo").toString())!!
+                    val u = DatabaseConnect.AllUsers.findUserByPseudo(ctx.formParam("pseudo").toString())!!
                     ctx.retour(200, Certification.create(u))
                 }
             }
@@ -127,7 +128,7 @@ object Server {
                 } else if (!EmailValidator.isEmailValid(ctx.formParam("email").toString())) {
                     ctx.retour(400, "EMAIL_INVALID")
                     //return@post
-                } else if (Database.allUsers.findUserByEmail(ctx.formParam("email").toString()) != null) {
+                } else if (DatabaseConnect.AllUsers.findUserByEmail(ctx.formParam("email").toString()) != null) {
                     ctx.retour(400, "EMAIL_ALREADY_EXIST")
                     //return@post
                 }
@@ -143,7 +144,7 @@ object Server {
                 } else if (ctx.formParam("pseudo").toString().length > 12) {
                     ctx.retour(400, "PSEUDO_TOO_LONG")
                     //return@post
-                } else if (Database.allUsers.findUserByPseudo(
+                } else if (DatabaseConnect.AllUsers.findUserByPseudo(
                         ctx.formParam("pseudo").toString()
                     ) != null
                 ) {
@@ -164,7 +165,7 @@ object Server {
                         ctx.formParam("pseudo").toString(),
                         ctx.formParam("password").toString()
                     )
-                    Database.allUsers.addUser(u)
+                    DatabaseConnect.AllUsers.addUser(u)
                     ctx.retour(201, Certification.create(u))
                 }
             }
@@ -208,12 +209,12 @@ object Server {
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) {
-                        val datauser = Database.allUsers.findUserById(ctx.pathParam("id").toInt())
+                        val datauser = DatabaseConnect.AllUsers.findUserById(ctx.pathParam("id").toInt())
                         if (datauser == null) {
                             ctx.retour(404, "USER_NOT_FOUND")
                             //return@verification
                         } else {
-                            ctx.retour(200, datauser.toJSON())
+                            ctx.retour(200, datauser)
                         }
                     }
                 }
@@ -264,7 +265,7 @@ object Server {
                                 ctx.retour(400, "PSEUDO_TOO_LONG")
                                 return@verification
                             }
-                            if (Database.allUsers.findUserByPseudo(pseudo) != null) {
+                            if (DatabaseConnect.AllUsers.findUserByPseudo(pseudo) != null) {
                                 ctx.retour(400, "PSEUDO_ALREADY_EXIST")
                                 return@verification
                             }
@@ -277,7 +278,7 @@ object Server {
                                 ctx.retour(400, "EMAIL_INVALID")
                                 return@verification
                             }
-                            if (Database.allUsers.findUserByEmail(email) != null) {
+                            if (DatabaseConnect.AllUsers.findUserByEmail(email) != null) {
                                 ctx.retour(400, "EMAIL_ALREADY_EXIST")
                                 return@verification
                             }
@@ -294,7 +295,7 @@ object Server {
                         user.pseudo = pseudo
                         user.email = email
                         user.password = password
-                        Database.saveToJSON()
+                        Jsonbase.saveToJSON()
                         ctx.retour(200, Certification.create(user))
                     }
 
@@ -315,8 +316,7 @@ object Server {
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
-                        Database.allUsers.removeUser(user)
-                        Database.saveToJSON()
+                       // DatabaseConnect.AllUsers.removeUser(user)
                         ctx.retour(200, "USER_DELETED")
                     }
                 }
@@ -453,11 +453,11 @@ object Server {
                     )]
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
-                        if (Database.allGuilds.findAllGuildByMember(user).isEmpty()) {
+                        if (Jsonbase.allGuilds.findAllGuildByMember(user).isEmpty()) {
                             ctx.retour(200, "NO_GUILD")
                             //return@verification
                         } else {
-                            ctx.retour(200, Database.allGuilds.findAllGuildByMember(user))
+                            ctx.retour(200, Jsonbase.allGuilds.findAllGuildByMember(user))
                         }
                     }
                 }
@@ -480,10 +480,10 @@ object Server {
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GET_OWNER_GUILD")
-                        if (Database.allGuilds.findAllGuildsByOwner(user).isEmpty()) {
+                        if (Jsonbase.allGuilds.findAllGuildsByOwner(user).isEmpty()) {
                             ctx.retour(400, "NO_OWNED_GUILD")
                         } else {
-                            ctx.retour(200, Database.allGuilds.findAllGuildsByOwner(user))
+                            ctx.retour(200, Jsonbase.allGuilds.findAllGuildsByOwner(user))
                         }
                     }
                 }
@@ -510,7 +510,7 @@ object Server {
                 ) { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_GUILD")
-                        ctx.retour(200, Database.allGuilds)
+                        ctx.retour(200, Jsonbase.allGuilds)
                     }
                 }
 
@@ -547,7 +547,7 @@ object Server {
                         if (ctx.formParam("name").isNullOrEmpty()) {
                             ctx.retour(400, "NAME_GUILD_REQUIRED")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildByName(ctx.formParam("name").toString()) != null) {
+                        } else if (Jsonbase.allGuilds.findGuildByName(ctx.formParam("name").toString()) != null) {
                             ctx.retour(400, "NAME_GUILD_ALREADY_EXIST")
                             //return@verification
                         } else if (ctx.formParam("typeOfWork").isNullOrEmpty()) {
@@ -557,7 +557,7 @@ object Server {
                             ctx.retour(400, "TYPE_WORK_NOT_EXIST")
                             //return@verification
                         } else {
-                            Database.allGuilds.addGuild(
+                            Jsonbase.allGuilds.addGuild(
                                 Guild(
                                     ctx.formParam("name").toString(),
                                     user,
@@ -593,11 +593,11 @@ object Server {
                         if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                             //return@verification
                         } else {
-                            ctx.retour(200, Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!)
+                            ctx.retour(200, Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!)
                         }
                     }
                 }
@@ -641,7 +641,7 @@ object Server {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             return@verification
                         }
-                        val guild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                        val guild = Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                         if (guild == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                             return@verification
@@ -650,7 +650,7 @@ object Server {
                         if (name.isEmpty()) {
                             name = guild.name
                         } else {
-                            if (Database.allGuilds.findGuildByName(name) != null) {
+                            if (Jsonbase.allGuilds.findGuildByName(name) != null) {
                                 ctx.retour(400, "GUILD_ALREADY_EXIST")
                                 return@verification
                             }
@@ -698,15 +698,15 @@ object Server {
                         if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                             //return@verification
-                        } else if (!Database.allGuilds.findAllGuildsByOwner(user)
-                                .contains(Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()))
+                        } else if (!Jsonbase.allGuilds.findAllGuildsByOwner(user)
+                                .contains(Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt()))
                         ) {
                             ctx.retour(400, "GUILD_NOT_OWNER")
                         } else {
-                            Database.allGuilds.remove(Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()))
+                            Jsonbase.allGuilds.remove(Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt()))
                             ctx.retour(200, "SUCCESS_DELETE_GUILD")
                         }
                     }
@@ -742,23 +742,23 @@ object Server {
                         if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.employees.contains(
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.employees.contains(
                                 user
                             )
                         ) {
                             ctx.retour(400, "PLAYER_ALREADY_IN_GUILD")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.waitingList.contains(
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())!!.waitingList.contains(
                                 user
                             )
                         ) {
                             ctx.retour(400, "PLAYER_ALREADY_IN_WAITING_LIST")
                             //return@verification
                         } else {
-                            Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.AddMember(user)
+                            Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())?.AddMember(user)
                             ctx.retour(200, "SUCCESS_JOIN_WAITING_LIST")
                         }
                     }
@@ -793,10 +793,10 @@ object Server {
                         if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                             return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 ?.RemoveMember(user) != true
                         ) {
                             ctx.retour(400, "PLAYER_NOT_IN_GUILD_OR_IS_OWNER")
@@ -834,10 +834,10 @@ object Server {
                         if (ctx.pathParam("id").isEmpty()) {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
-                        } else if (Database.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
+                        } else if (Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt()) == null) {
                             ctx.retour(404, "GUILD_NOT_FOUND")
                         } else {
-                            Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                            Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 ?.let { ctx.retour(200, it.owner) }
                         }
                     }
@@ -872,7 +872,7 @@ object Server {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else {
-                            val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                            val dataguild = Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                             if (dataguild == null) {
                                 ctx.retour(404, "GUIlD_NOT_FOUND")
                                 //return@verification
@@ -915,7 +915,7 @@ object Server {
                             ctx.retour(400, "ID_GUILD_REQUIRED")
                             //return@verification
                         } else {
-                            val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                            val dataguild = Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                             if (dataguild == null) {
                                 ctx.retour(404, "GUILD_NOT_EXIST")
                                 //return@verification
@@ -972,12 +972,12 @@ object Server {
                             ctx.retour(400, "ID_PLAYER_REQUIRED")
                             //return@verification
                         } else {
-                            val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
+                            val datauser = DatabaseConnect.AllUsers.findUserById(ctx.pathParam("playerId").toInt())
                             if (datauser == null) {
                                 ctx.retour(404, "PLAYER_NOT_FOUND")
                                 //return@verification
                             } else {
-                                val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                                val dataguild = Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 if (dataguild == null) {
                                     ctx.retour(404, "GUILD_NOT_FOUND")
                                     //return@verification
@@ -1041,12 +1041,12 @@ object Server {
                             ctx.retour(400, "ID_PLAYER_REQUIRED")
                             //return@verification
                         } else {
-                            val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
+                            val datauser = DatabaseConnect.AllUsers.findUserById(ctx.pathParam("playerId").toInt())
                             if (datauser == null) {
                                 ctx.retour(400, "PLAYER_NOT_FOUND")
                                 //return@verification
                             } else {
-                                val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                                val dataguild = Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 if (dataguild == null) {
                                     ctx.retour(404, "GUI_NOT_FOUND")
                                     //return@verification
@@ -1109,12 +1109,12 @@ object Server {
                             ctx.retour(400, "ID_PLAYER_REQUIRED")
                             //return@verification
                         } else {
-                            val datauser = Database.allUsers.findUserById(ctx.pathParam("playerId").toInt())
+                            val datauser = DatabaseConnect.AllUsers.findUserById(ctx.pathParam("playerId").toInt())
                             if (datauser == null) {
                                 ctx.retour(404, "PLAYER_NOT_FOUND")
                                 //return@verification
                             } else {
-                                val dataguild = Database.allGuilds.findGuildById(ctx.pathParam("id").toInt())
+                                val dataguild = Jsonbase.allGuilds.findGuildById(ctx.pathParam("id").toInt())
                                 if (dataguild == null) {
                                     ctx.retour(404, "GUI_NOT_FOUND")
                                     //return@verification
@@ -1153,7 +1153,7 @@ object Server {
                 ) { ctx -> //List last message from 5 minutes
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_CHAT")
-                        ctx.retour(200, Database.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time))
+                        ctx.retour(200, Jsonbase.allChat.getMessagesBeetweenDate(Date().time - 300000, Date().time))
                     }
                 }
 
@@ -1182,7 +1182,7 @@ object Server {
                             ctx.retour(400, "MESSAGE_REQUIRED")
                             //return@verification
                         } else {
-                            Database.allChat.addMessage(Message(message, user, Date().time))
+                            Jsonbase.allChat.addMessage(Message(message, user, Date().time))
                             ctx.retour(200, "SUCCESS_CREATE_MESSAGE_CHAT")
                         }
                     }
@@ -1205,7 +1205,7 @@ object Server {
                 ) { ctx ->
                     Certification.verification(ctx) {
                         logger.info("GET_ALL_CHAT")
-                        ctx.retour(200, Database.allChat)
+                        ctx.retour(200, Jsonbase.allChat)
                     }
                 }
             }
@@ -1232,7 +1232,7 @@ object Server {
                 ) { ctx ->
                     Certification.verification(ctx) { user ->
                         logger.info("GET_CURRENT_MAP_FOR_USER")
-                        val current = Database.allGuilds.findGuildById(user.player.currentGuildMap)
+                        val current = Jsonbase.allGuilds.findGuildById(user.player.currentGuildMap)
                         if (current == null) {
                             ctx.retour(404, "PLAYER_IS_NOT_IN_ANY_MAP")
                             //return@verification
@@ -1266,7 +1266,7 @@ object Server {
                     Certification.verification(ctx) { user ->
                         logger.info("GO_TO_MAP")
                         val id = ctx.pathParam("id").toInt()
-                        val guild = Database.allGuilds.findGuildById(id)
+                        val guild = Jsonbase.allGuilds.findGuildById(id)
                         if (guild == null) {
                             ctx.retour(404, "GUILD_MAP_NOT_EXIST")
                             //return@verification

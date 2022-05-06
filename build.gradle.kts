@@ -11,6 +11,7 @@ val slf4jVersion: String by project
 val jacksonVersion: String by project
 val kjwtVersion: String by project
 val ktormVersion: String by project
+val mysqlConnectorVersion: String by project
 
 repositories {
     mavenCentral()
@@ -34,6 +35,7 @@ dependencies {
     implementation("io.github.nefilim.kjwt:kjwt-jwks:$kjwtVersion")
 
     implementation("org.ktorm:ktorm-core:$ktormVersion")
+    implementation("mysql:mysql-connector-java:$mysqlConnectorVersion")
 }
 
 distributions {

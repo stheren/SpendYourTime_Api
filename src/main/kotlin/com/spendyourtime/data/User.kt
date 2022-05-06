@@ -1,31 +1,34 @@
 package com.spendyourtime.data
 
-import com.spendyourtime.helpers.Database
+import com.spendyourtime.helpers.DatabaseConnect
+import com.spendyourtime.helpers.Jsonbase
 import com.spendyourtime.helpers.Sha512
 
-data class User(var email: String, var pseudo: String, var password: String, var player : Player = Player()){
+data class User(var email: String, var pseudo: String, var password: String, var player: Player = Player()){
+
 
     companion object {
-        private fun getUniqueID(): Int {
-            var key = 0
-            while (Database.allUsers.any { it.id == key }) {
-                key++
-            }
-            return key
+        var id: Int = 0
+//        private fun getUniqueID(): Int {
+//            var key = 0
+//            while (Jsonbase.allUsers.any { it.id == key }) {
+//                key++
+//            }
+//            return key
+//        }
+
+        fun IncrementId() {
+            User.id++
         }
     }
 
-    var id: Int = getUniqueID()
+
     init{
         password = Sha512.encode(password)
-        if(Database.allUsers.contains(this))
-            throw Exception("USER_ALREADY_EXIST")
-        for(user in Database.allUsers){
-            if (user.pseudo == this.pseudo)
-                throw Exception("PSEUDO_ALREADY_EXIST")
-            if(user.email == this.email)
-                throw Exception("EMAIL_ALREADY_EXIST")
-        }
+        if (DatabaseConnect.AllUsers.findUserByPseudo(this.pseudo) != null)
+            throw Exception("PSEUDO_ALREADY_EXIST")
+        if(DatabaseConnect.AllUsers.findUserByEmail(this.email) != null)
+            throw Exception("EMAIL_ALREADY_EXIST")
     }
 
     constructor() : this("","","") {}
@@ -43,8 +46,10 @@ data class User(var email: String, var pseudo: String, var password: String, var
         return result
     }
 
+
+
     // Function to return data of the user without password on JSON format
-    fun toJSON(): String{
-        return "{\"id\":$id,\"email\":\"$email\",\"pseudo\":\"$pseudo\",\"player\":${player.toJSON()}}"
-    }
+//    fun toJSON(): String{
+//        return "{\"id\":$id,\"email\":\"$email\",\"pseudo\":\"$pseudo\",\"player\":${player.toJSON()}}"
+//    }
 }

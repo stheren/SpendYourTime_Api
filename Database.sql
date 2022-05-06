@@ -1,7 +1,7 @@
 CREATE DATABASE SpendYourTime;
 
 -- table for users
-CREATE TABLE SpendYourTime.Users (user_id int NOT NULL,
+CREATE TABLE SpendYourTime.Users (user_id int NOT NULL AUTO_INCREMENT,
                     email varchar(255) NOT NULL UNIQUE,
                     pseudo varchar(255) NOT NULL UNIQUE,
                     password varchar(255) NOT NULL,
@@ -20,13 +20,13 @@ CREATE TABLE SpendYourTime.Player (user_id int NOT NULL,
                      CONSTRAINT pk_player_id PRIMARY KEY CLUSTERED (user_id));
 
 -- table for the map
-CREATE TABLE SpendYourTime.Maps (map_id int NOT NULL,
+CREATE TABLE SpendYourTime.Maps (map_id int NOT NULL AUTO_INCREMENT,
                   map_width int NOT NULL,
                   map_height int NOT NULL,
                   CONSTRAINT pk_map_id PRIMARY KEY CLUSTERED (map_id));
 
 -- table for the guild with a guild_id auto increment, guild_name, owner link at user_id and map_id
-CREATE TABLE SpendYourTime.Guilds (guild_id int NOT NULL,
+CREATE TABLE SpendYourTime.Guilds (guild_id int NOT NULL AUTO_INCREMENT,
                     guild_name varchar(255) NOT NULL UNIQUE,
                     owner int NOT NULL UNIQUE,
                     map_id int NOT NULL,

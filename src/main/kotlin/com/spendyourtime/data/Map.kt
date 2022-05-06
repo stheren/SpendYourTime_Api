@@ -1,7 +1,5 @@
 package com.spendyourtime.data
 
-import com.spendyourtime.helpers.Database
-
 class Map {
     var background : MutableList<MutableList<Int>> = MutableList(10) { MutableList(10) { 0 } }
     var foreground : MutableList<MutableList<Int>> = MutableList(10) { MutableList(10) { 0 } }

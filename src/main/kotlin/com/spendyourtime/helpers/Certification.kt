@@ -27,7 +27,7 @@ object Certification {
     fun find(ctx : Context, token : String, p : (User?) -> Unit) {
         val e = JWT.decode(token).tap {
             it.claimValue("email").tap { email ->
-                    p(Database.allUsers.findUserByEmail(email))
+                    p(DatabaseConnect.AllUsers.findUserByEmail(email))
             }
         }
         e.handleError {

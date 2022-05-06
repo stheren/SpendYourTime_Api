@@ -1,6 +1,6 @@
 package com.spendyourtime.data
 
-import com.spendyourtime.helpers.Database
+import com.spendyourtime.helpers.Jsonbase
 
 class Guild(var name: String, var owner: User, var typeWork: Work) {
 
@@ -9,7 +9,7 @@ class Guild(var name: String, var owner: User, var typeWork: Work) {
     companion object {
         private fun getUniqueID(): Int {
             var key = 0
-            while (Database.allGuilds.any { it.id == key }) {
+            while (Jsonbase.allGuilds.any { it.id == key }) {
                 key++
             }
             return key
@@ -21,7 +21,7 @@ class Guild(var name: String, var owner: User, var typeWork: Work) {
 
     var place = Map()
         get() {
-            return field.get(Database.allUsers.filter { it.player.currentGuildMap == this.id }.map { it.player })
+            return field.get(Jsonbase.allUsers.filter { it.player.currentGuildMap == this.id }.map { it.player })
         }
 
     var waitingList = arrayListOf<User>()
@@ -29,7 +29,7 @@ class Guild(var name: String, var owner: User, var typeWork: Work) {
     var tasks = arrayListOf<Work>()
 
     init {
-        for (g in Database.allGuilds) {
+        for (g in Jsonbase.allGuilds) {
             if (g.name == name)
                 throw Exception("NAME_ALREADY_EXIST")
             if (g.owner.equals(owner))

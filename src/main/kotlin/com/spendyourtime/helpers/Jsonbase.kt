@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory
 import java.nio.file.Paths
 
 
-object Database {
+object Jsonbase {
     class Users : ArrayList<User>(){
         fun findUserByPseudo(pseudo: String): User? {
             return find { it.pseudo == pseudo }
@@ -28,9 +28,9 @@ object Database {
             saveToJSON()
         }
 
-        fun findUserById(id: Int): User? {
-            return find { it.id == id }
-        }
+//        fun findUserById(id: Int): User? {
+//            return find { it.id == id }
+//        }
 
         fun removeUser(user: User) {
             allUsers.remove(user)
